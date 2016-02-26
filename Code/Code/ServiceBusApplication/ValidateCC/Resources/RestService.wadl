@@ -1,0 +1,21 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<application xmlns:soa="http://www.oracle.com/soa/rest" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:inp1="http://www.oracle.com/soasample" xmlns="http://wadl.dev.java.net/2009/02">
+   <doc title="RestService">RestService</doc>
+   <grammars>
+      <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://xmlns.oracle.com/ServiceBusApplication/ValidateCC/ValidateCrCard" xmlns:inp1="http://www.oracle.com/soasample" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+            <xsd:import namespace="http://www.oracle.com/soasample" schemaLocation="../CanonicalOrder.xsd"/>
+        </xsd:schema>
+   </grammars>
+   <resources>
+      <resource path="/">
+         <method name="POST" soa:wsdlOperation="execute">
+            <request>
+               <representation mediaType="application/json" element="cns:PaymentInfo" xmlns:cns="http://www.oracle.com/soasample"/>
+            </request>
+            <response status="200">
+               <representation mediaType="application/json" element="cns:PaymentStatus" xmlns:cns="http://www.oracle.com/soasample"/>
+            </response>
+         </method>
+      </resource>
+   </resources>
+</application>

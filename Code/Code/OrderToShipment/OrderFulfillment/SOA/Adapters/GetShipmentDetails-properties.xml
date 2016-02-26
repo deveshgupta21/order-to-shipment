@@ -1,0 +1,31 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+   <entry key="SHIPPING_PROVIDERS:db_table_type">TABLE</entry>
+   <entry key="SHIPPING_PROVIDERS:db_column_1">NAME</entry>
+   <entry key="SHIPPING_PROVIDERS:db_column_0">PROVIDER_ID</entry>
+   <entry key="SHIPPING_PROVIDERS.PROVIDER_ID:db_column_type">NUMBER</entry>
+   <entry key="SHIPPING_METHODS.METHODS_ID:db_column_scale">0</entry>
+   <entry key="SHIPPING_METHODS.METHODS_ID:db_column_type">NUMBER</entry>
+   <entry key="SHIPPING_PROVIDERS.PROVIDER_ID:db_column_precision">19</entry>
+   <entry key="SHIPPING_METHODS.NAME:db_column_type">VARCHAR2</entry>
+   <entry key="SHIPPING_METHODS.NAME:db_column_not_null">false</entry>
+   <entry key="SHIPPING_PROVIDERS.NAME:db_column_type">VARCHAR2</entry>
+   <entry key="SHIPPING_METHODS:db_table_type">TABLE</entry>
+   <entry key="SHIPPING_METHODS.PROVIDER_ID:db_column_not_null">false</entry>
+   <entry key="return_single_result_set">false</entry>
+   <entry key="SHIPPING_METHODS.METHODS_ID:db_column_precision">19</entry>
+   <entry key="SHIPPING_METHODS.PROVIDER_ID:db_column_precision">19</entry>
+   <entry key="SHIPPING_METHODS.PROVIDER_ID:db_column_type">NUMBER</entry>
+   <entry key="SHIPPING_METHODS:db_column_2">PROVIDER_ID</entry>
+   <entry key="SHIPPING_METHODS.PROVIDER_ID:db_column_scale">0</entry>
+   <entry key="SHIPPING_METHODS:db_column_1">NAME</entry>
+   <entry key="SHIPPING_METHODS.NAME:db_column_size">30</entry>
+   <entry key="SHIPPING_METHODS:db_column_0">METHODS_ID</entry>
+   <entry key="root_descriptor_alias">SHIPPING_METHODS</entry>
+   <entry key="SHIPPING_PROVIDERS.NAME:db_column_size">30</entry>
+   <entry key="SHIPPING_METHODS.METHODS_ID:db_column_not_null">true</entry>
+   <entry key="SHIPPING_PROVIDERS.PROVIDER_ID:db_column_not_null">true</entry>
+   <entry key="SHIPPING_PROVIDERS.NAME:db_column_not_null">false</entry>
+   <entry key="SHIPPING_PROVIDERS.PROVIDER_ID:db_column_scale">0</entry>
+</properties>

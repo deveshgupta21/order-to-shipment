@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<schema attributeFormDefault="unqualified"
+	elementFormDefault="qualified"
+	targetNamespace="http://xmlns.oracle.com/OrderToShipment/ErrorFramework/ErrorProcess"
+	xmlns="http://www.w3.org/2001/XMLSchema">
+	<element name="process">
+		<complexType>
+			<sequence>
+				<element name="OrderNum" type="string" minOccurs="0"/>
+                                <element name="ProcessName" type="string" minOccurs="0"/>
+                                <element name="ErrorMessage" type="string" minOccurs="0"/>
+                                <element name="ErrorCode" type="string" minOccurs="0"/>
+			</sequence>
+		</complexType>
+	</element>
+</schema>

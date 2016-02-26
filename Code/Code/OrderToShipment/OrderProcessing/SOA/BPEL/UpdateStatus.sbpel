@@ -1,0 +1,59 @@
+<?xml version = "1.0" encoding = "UTF-8" ?>
+<!--
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  Oracle JDeveloper BPEL Designer
+
+  Created: Fri Feb 19 23:59:46 IST 2016
+  Author:  devegupta
+  Type: BPEL 2.0 Subprocess
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+-->
+<bpelx:subProcess name="UpdateStatus"
+               targetNamespace="http://xmlns.oracle.com/OrderToShipment/OrderProcessing/UpdateStatus"
+               xmlns="http://docs.oasis-open.org/wsbpel/2.0/process/executable"
+               xmlns:client="http://xmlns.oracle.com/OrderToShipment/OrderProcessing/UpdateStatus"
+               xmlns:bpelx="http://schemas.oracle.com/bpel/extension"
+               xmlns:bpel="http://docs.oasis-open.org/wsbpel/2.0/process/executable"
+               xmlns:ora="http://schemas.oracle.com/xpath/extension"
+               xmlns:ui="http://xmlns.oracle.com/soa/designer"
+               xsi:type="bpel:tProcess" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                  xmlns:ns1="http://xmlns.oracle.com/pcbpel/adapter/db/OrderToShipment/OrderProcessing/UpdateOrderStatus"
+                  xmlns:ns2="http://xmlns.oracle.com/pcbpel/adapter/db/top/UpdateOrderStatus">
+   <!--
+      ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+       ORCHESTRATION LOGIC
+       Set of activities coordinating the flow of messages across the
+       services integrated within this business process
+      ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    -->
+  <partnerLinks>
+    <partnerLink name="UpdateOrderStatus" partnerLinkType="ns1:UpdateOrderStatus_plt"
+                 partnerRole="UpdateOrderStatus_role"/>
+  </partnerLinks>
+  <variables>
+    <variable name="OrderN" type="xsd:string"/>
+    <variable name="status" type="xsd:string"/>
+    <variable name="UpdateOrderStatus_update_InputVariable" messageType="ns1:OrdersCollection_msg"/>
+  </variables>
+  <faultHandlers>
+    <catchAll>
+      <exit name="Exit1"/>
+    </catchAll>
+  </faultHandlers>
+  <sequence name="main">
+    <assign name="Assign1">
+      <copy>
+        <from>$OrderN</from>
+        <to>$UpdateOrderStatus_update_InputVariable.OrdersCollection/ns2:Orders/ns2:orderNumber</to>
+      </copy>
+      <copy>
+        <from>$status</from>
+        <to>$UpdateOrderStatus_update_InputVariable.OrdersCollection/ns2:Orders/ns2:status</to>
+      </copy>
+    </assign>
+    <invoke name="UpdateOrderStatus" partnerLink="UpdateOrderStatus"
+            portType="ns1:UpdateOrderStatus_ptt" operation="update"
+            inputVariable="UpdateOrderStatus_update_InputVariable" bpelx:invokeAsDetail="no"/>
+  </sequence>
+</bpelx:subProcess>

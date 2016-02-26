@@ -1,0 +1,20 @@
+,><?xml version='1.0' encoding='UTF-8'?><application xmlns:soa="http://www.oracle.com/soa/rest" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:tns="http://xmlns.oracle.com/OrderToShipment/ValidateCC/ValidateCC" xmlns:ns0="http://www.oracle.com/soasample" xmlns="http://wadl.dev.java.net/2009/02">
+   <doc title="ValidateCC">RestService</doc>
+   <grammars>
+      <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+            <xsd:import schemaLocation="http://127.0.0.1:7001/soa-infra/services/default/ValidateCC!1.0/apps/soa/Schemas/CanonicalOrder.xsd" namespace="http://www.oracle.com/soasample"/>
+        </xsd:schema>
+   </grammars>
+   <resources base="http://127.0.0.1:7001/soa-infra/resources/default/ValidateCC!1.0/ValidateCC">
+      <resource path="/ValidateCard">
+         <method name="POST" soa:wsdlOperation="ValidateCC">
+            <request>
+               <representation xmlns:cns="http://www.oracle.com/soasample" mediaType="application/json" element="cns:PaymentInfo"/>
+            </request>
+            <response status="200">
+               <representation xmlns:cns="http://www.oracle.com/soasample" mediaType="application/json" element="cns:PaymentStatus"/>
+            </response>
+         </method>
+      </resource>
+   </resources>
+</application>

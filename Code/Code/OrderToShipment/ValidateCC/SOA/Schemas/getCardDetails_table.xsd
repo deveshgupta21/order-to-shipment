@@ -1,0 +1,34 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<xs:schema targetNamespace="http://xmlns.oracle.com/pcbpel/adapter/db/top/getCardDetails" xmlns="http://xmlns.oracle.com/pcbpel/adapter/db/top/getCardDetails" elementFormDefault="qualified" attributeFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+   <xs:element name="CreditcarddetailsCollection" type="CreditcarddetailsCollection"/>
+   <xs:complexType name="CreditcarddetailsCollection">
+      <xs:sequence>
+         <xs:element name="Creditcarddetails" type="Creditcarddetails" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name="Creditcarddetails">
+      <xs:sequence>
+         <xs:element name="paymentType" type="string20" minOccurs="0" nillable="true"/>
+         <xs:element name="cardNumber" type="string20" nillable="true"/>
+         <xs:element name="expiryDate" type="string4" minOccurs="0" nillable="true"/>
+         <xs:element name="cardName" type="string20" minOccurs="0" nillable="true"/>
+         <xs:element name="dailyLimit" type="xs:decimal" minOccurs="0" nillable="true"/>
+      </xs:sequence>
+   </xs:complexType>
+   <xs:element name="getCardDetailsSelect_cnInputParameters" type="getCardDetailsSelect_cn"/>
+   <xs:complexType name="getCardDetailsSelect_cn">
+      <xs:sequence>
+         <xs:element name="cn" type="xs:string" minOccurs="1" maxOccurs="1"/>
+      </xs:sequence>
+   </xs:complexType>
+   <xs:simpleType name="string20">
+      <xs:restriction base="xs:string">
+         <xs:maxLength value="20"/>
+      </xs:restriction>
+   </xs:simpleType>
+   <xs:simpleType name="string4">
+      <xs:restriction base="xs:string">
+         <xs:maxLength value="4"/>
+      </xs:restriction>
+   </xs:simpleType>
+</xs:schema>

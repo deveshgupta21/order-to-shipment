@@ -1,0 +1,34 @@
+<wsdl:definitions
+     name="PollOrderForFulfillment"
+     targetNamespace="http://xmlns.oracle.com/pcbpel/adapter/db/OrderToShipment/OrderFulfillment/PollOrderForFulfillment"
+     xmlns:tns="http://xmlns.oracle.com/pcbpel/adapter/db/OrderToShipment/OrderFulfillment/PollOrderForFulfillment"
+     xmlns:jca="http://xmlns.oracle.com/pcbpel/wsdl/jca/"
+     xmlns:plt="http://schemas.xmlsoap.org/ws/2003/05/partner-link/"
+     xmlns:pc="http://xmlns.oracle.com/pcbpel/"
+     xmlns:top="http://xmlns.oracle.com/pcbpel/adapter/db/top/PollOrderForFulfillment"
+     xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+    >
+  <plt:partnerLinkType name="PollOrderForFulfillment_plt" >
+    <plt:role name="PollOrderForFulfillment_role" >
+      <plt:portType name="tns:PollOrderForFulfillment_ptt" />
+    </plt:role>
+  </plt:partnerLinkType>
+  <plt:partnerLinkType name="PollOrderForFulfillment_plt" >
+    <plt:role name="PollOrderForFulfillment_role" >
+      <plt:portType name="tns:PollOrderForFulfillment_ptt" />
+    </plt:role>
+  </plt:partnerLinkType>
+    <wsdl:types>
+      <schema xmlns="http://www.w3.org/2001/XMLSchema" >
+        <import namespace="http://xmlns.oracle.com/pcbpel/adapter/db/top/PollOrderForFulfillment" schemaLocation="../Schemas/PollOrderForFulfillment_table.xsd" />
+      </schema>
+    </wsdl:types>
+    <wsdl:message name="OrdersCollection_msg">
+        <wsdl:part name="OrdersCollection" element="top:OrdersCollection"/>
+    </wsdl:message>
+    <wsdl:portType name="PollOrderForFulfillment_ptt">
+        <wsdl:operation name="receive">
+            <wsdl:input message="tns:OrdersCollection_msg"/>
+        </wsdl:operation>
+    </wsdl:portType>
+</wsdl:definitions>

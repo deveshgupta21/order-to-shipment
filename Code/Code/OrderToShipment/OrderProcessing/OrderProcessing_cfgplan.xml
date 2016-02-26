@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SOAConfigPlan xmlns:jca="http://platform.integration.oracle/blocks/adapter/fw/metadata" xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy" xmlns:orawsp="http://schemas.oracle.com/ws/2006/01/policy" xmlns:edl="http://schemas.oracle.com/events/edl" xmlns="http://schemas.oracle.com/soa/configplan">
+   <composite name="OrderProcessing">
+      <!--Add search and replace rules for the import section of a composite
+	Example:
+	<searchReplace>
+		<search>http://my-dev-server</search>
+		<replace>http://my-test-server</replace>
+	<searchReplace>
+	<searchReplace>
+		<search>8888</search>
+		<replace>8889</replace>
+	<searchReplace>-->
+      <import>
+         <searchReplace>
+            <search/>
+            <replace/>
+         </searchReplace>
+      </import>
+      <service name="orderprocess_client_ep">
+         <binding type="ws">
+            <attribute name="port">
+               <replace>http://xmlns.oracle.com/OrderToShipment/OrderProcessing/OrderProcess#wsdl.endpoint(orderprocess_client_ep/OrderProcess_pt)</replace>
+            </attribute>
+         </binding>
+      </service>
+      <service name="orderprocess_client"/>
+      <property name="productVersion">
+         <replace>12.1.3.0.0</replace>
+      </property>
+      <property name="compositeID">
+         <replace>467c9f34-5f65-4a4d-804e-1260e7b9afd2</replace>
+      </property>
+      <property name="oracle.composite.faultPolicyFile">
+         <replace>oramds:/apps/soa/FaultPolicy/fault-policies.xml</replace>
+      </property>
+      <property name="oracle.composite.faultBindingFile">
+         <replace>oramds:/apps/soa/FaultPolicy/fault-bindings.xml</replace>
+      </property>
+      <!--Add search and replace rules for the component properties
+	For components and service/reference bindings, you can add policy references.
+	Example:
+	<component name="*">
+		<wsp:PolicyReference orawsp:category="management" orawsp:status="enabled" URI="oracle/log_policy"/>
+	</component>-->
+      <component name="OrderProcess">
+         <property name="bpel.config.oneWayDeliveryPolicy">
+            <replace>async.persist</replace>
+         </property>
+         <property name="bpel.preference.ProjectName">
+            <replace>OrderProcess</replace>
+         </property>
+      </component>
+      <reference name="OrderToDB"/>
+      <reference name="ValidateCreditCard"/>
+      <reference name="ErrorHandler"/>
+      <reference name="UpdateOrderStatus"/>
+      <reference name="OrderToDB">
+         <property name="jca.retry.count">
+            <replace>4</replace>
+         </property>
+         <property name="jca.retry.interval">
+            <replace>1</replace>
+         </property>
+         <property name="jca.retry.backoff">
+            <replace>2</replace>
+         </property>
+         <property name="jca.retry.maxInterval">
+            <replace>120</replace>
+         </property>
+         <binding type="jca"/>
+      </reference>
+      <reference name="ValidateCreditCard">
+         <!--Add search and replace rules for the binding properties-->
+         <binding type="ws">
+            <attribute name="port">
+               <replace>http://xmlns.oracle.com/ServiceBusApplication/ValidateCC/ValidateCrCard#wsdl.endpoint(execute_bindQSService/execute_bindQSPort)</replace>
+            </attribute>
+            <attribute name="location">
+               <replace>http://127.0.0.1:7001/ValidateCC/ValidateCrCardProxyService?wsdl</replace>
+            </attribute>
+            <property name="weblogic.wsee.wsat.transaction.flowOption">
+               <replace>WSDLDriven</replace>
+            </property>
+         </binding>
+      </reference>
+      <reference name="UpdateOrderStatus">
+         <property name="jca.retry.count">
+            <replace>4</replace>
+         </property>
+         <property name="jca.retry.interval">
+            <replace>1</replace>
+         </property>
+         <property name="jca.retry.backoff">
+            <replace>2</replace>
+         </property>
+         <property name="jca.retry.maxInterval">
+            <replace>120</replace>
+         </property>
+         <binding type="jca"/>
+      </reference>
+      <reference name="ErrorHandler">
+         <!--Add search and replace rules for the binding properties-->
+         <binding type="ws">
+            <attribute name="port">
+               <replace>http://xmlns.oracle.com/OrderToShipment/ErrorFramework/ErrorProcess#wsdl.endpoint(errorprocess_client_ep/ErrorProcess_pt)</replace>
+            </attribute>
+            <attribute name="location">
+               <replace>oramds:/apps/soa/WSDL/ErrorProcess.wsdl</replace>
+            </attribute>
+            <property name="weblogic.wsee.wsat.transaction.flowOption">
+               <replace>WSDLDriven</replace>
+            </property>
+         </binding>
+      </reference>
+   </composite>
+   <!--To configure monitor.config: 
+	<property name="enabled"><replace>true</replace></property>
+	<property name="dataObjectsFolder"><searchReplace><search>mydev</search><replace>myproduction</replace></searchReplace></property>
+	
+	sample properties to configure for adapter: 
+	<jca:property name="QueueName"><replace>medmq1</replace></jca:property>
+	
+	To add search and replace rules for wsdls, xsd and jca files
+	Example:
+	<searchReplace>
+		<search>http://my-dev-server</search>
+		<replace>http://my-test-server</replace>
+	<searchReplace>
+	<searchReplace>
+		<search>8888</search>
+		<replace>8889</replace>
+	<searchReplace>
+	-->
+   <wsdlAndSchema name="Adapters/OrderToDB_db.jca|Adapters/UpdateOrderStatus_db.jca|Schemas/OrderToDB_table.xsd|Schemas/UpdateOrderStatus_table.xsd|WSDLs/ErrorProcess.wsdl|WSDLs/OrderProcess.wsdl|WSDLs/OrderToDB.wsdl|WSDLs/UpdateOrderStatus.wsdl|WSDLs/ValidateCrCardProxyServiceWrapper.wsdl">
+      <searchReplace>
+         <search/>
+         <replace/>
+      </searchReplace>
+   </wsdlAndSchema>
+</SOAConfigPlan>

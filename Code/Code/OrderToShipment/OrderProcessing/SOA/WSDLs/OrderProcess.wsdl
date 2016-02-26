@@ -1,0 +1,28 @@
+<?xml version= '1.0' encoding= 'UTF-8' ?>
+<wsdl:definitions
+     name="OrderProcess"
+     targetNamespace="http://xmlns.oracle.com/OrderToShipment/OrderProcessing/OrderProcess"
+     xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+     xmlns:client="http://xmlns.oracle.com/OrderToShipment/OrderProcessing/OrderProcess"
+     xmlns:ns1="http://www.oracle.com/soasample"
+     xmlns:plnk="http://docs.oasis-open.org/wsbpel/2.0/plnktype"
+    >
+    <plnk:partnerLinkType name="OrderProcess">
+        <plnk:role name="OrderProcessProvider" portType="client:OrderProcess"/>
+    </plnk:partnerLinkType>
+    <wsdl:types>
+        <schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+             xmlns:client="http://xmlns.oracle.com/OrderToShipment/OrderProcessing/OrderProcess"
+             xmlns:ns1="http://www.oracle.com/soasample" xmlns:plnk="http://docs.oasis-open.org/wsbpel/2.0/plnktype">
+            <import namespace="http://www.oracle.com/soasample" schemaLocation="oramds:/apps/soa/Schemas/CanonicalOrder.xsd"/>
+        </schema>
+    </wsdl:types>
+    <wsdl:message name="OrderProcessRequestMessage">
+        <wsdl:part name="payload" element="ns1:Order"/>
+    </wsdl:message>
+    <wsdl:portType name="OrderProcess">
+        <wsdl:operation name="process">
+            <wsdl:input message="client:OrderProcessRequestMessage"/>
+        </wsdl:operation>
+    </wsdl:portType>
+</wsdl:definitions>

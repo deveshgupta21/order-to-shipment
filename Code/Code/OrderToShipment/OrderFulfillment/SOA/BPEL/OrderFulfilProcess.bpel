@@ -1,0 +1,175 @@
+<?xml version = "1.0" encoding = "UTF-8" ?>
+<!--
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  Oracle JDeveloper BPEL Designer 
+  
+  Created: Sat Feb 20 14:04:58 IST 2016
+  Author:  devegupta
+  Type: BPEL 2.0 Process
+  Purpose: One Way BPEL Process
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+-->
+<process name="OrderFulfilProcess"
+               targetNamespace="http://xmlns.oracle.com/OrderToShipment/OrderFulfillment/OrderFulfilProcess"
+               xmlns="http://docs.oasis-open.org/wsbpel/2.0/process/executable"
+               xmlns:client="http://xmlns.oracle.com/OrderToShipment/OrderFulfillment/OrderFulfilProcess"
+               xmlns:ora="http://schemas.oracle.com/xpath/extension"
+               xmlns:ui="http://xmlns.oracle.com/soa/designer"
+               xmlns:bpel="http://docs.oasis-open.org/wsbpel/2.0/process/executable"
+         xmlns:ns1="http://xmlns.oracle.com/DetermineShipmentMethod/DetermineShipmentMethod_DecisionService_1"
+         xmlns:bpelx="http://schemas.oracle.com/bpel/extension" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns:ns2="http://www.oracle.com/soasample" xmlns:ns3="http://xmlns.oracle.com/bpel"
+         xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+         xmlns:ns4="http://xmlns.oracle.com/pcbpel/adapter/db/OrderToShipment/OrderFulfillment/GetShipmentDetails"
+         xmlns:ns5="http://xmlns.oracle.com/pcbpel/adapter/db/top/GetShipmentDetails"
+         xmlns:ns6="http://xmlns.oracle.com/OrderToShipment/PackAndShip/PackAndShipProcess"
+         xmlns:ns7="http://xmlns.oracle.com/OrderToShipment/ErrorFramework/ErrorProcess"
+         xmlns:bpws="http://schemas.xmlsoap.org/ws/2003/03/business-process/"
+         xmlns:xp20="http://www.oracle.com/XSL/Transform/java/oracle.tip.pc.services.functions.Xpath20"
+         xmlns:bpm="http://xmlns.oracle.com/bpmn20/extensions"
+         xmlns:oraext="http://www.oracle.com/XSL/Transform/java/oracle.tip.pc.services.functions.ExtFunc"
+         xmlns:dvm="http://www.oracle.com/XSL/Transform/java/oracle.tip.dvm.LookupValue"
+         xmlns:hwf="http://xmlns.oracle.com/bpel/workflow/xpath"
+         xmlns:ids="http://xmlns.oracle.com/bpel/services/IdentityService/xpath"
+         xmlns:ess="http://xmlns.oracle.com/scheduler"
+         xmlns:xdk="http://schemas.oracle.com/bpel/extension/xpath/function/xdk"
+         xmlns:xref="http://www.oracle.com/XSL/Transform/java/oracle.tip.xref.xpath.XRefXPathFunctions"
+         xmlns:ldap="http://schemas.oracle.com/xpath/extension/ldap">
+
+  <import ui:processWSDL="true" namespace="http://xmlns.oracle.com/OrderToShipment/OrderFulfillment/OrderFulfilProcess" location="../WSDLs/OrderFulfilProcess.wsdl" importType="http://schemas.xmlsoap.org/wsdl/"/>
+  <!-- 
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      PARTNERLINKS                                                      
+      List of services participating in this BPEL process               
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  --> 
+  <partnerLinks>
+    <!-- 
+      The 'client' role represents the requester of this service. It is 
+      used for callback. The location and correlation information associated
+      with the client role are automatically set using WS-Addressing.
+    -->
+    <partnerLink name="orderfulfilprocess_client" partnerLinkType="client:OrderFulfilProcess" myRole="OrderFulfilProcessProvider"/>
+    <partnerLink name="DetermineShipmentMethod.DetermineShipmentMethod_DecisionService_1"
+                 partnerLinkType="ns1:DetermineShipmentMethod.DetermineShipmentMethod_DecisionService_1"
+                 partnerRole="IDecisionService"/>
+    <partnerLink name="GetShipmentDetails" partnerLinkType="ns4:GetShipmentDetails_plt"
+                 partnerRole="GetShipmentDetails_role"/>
+    <partnerLink name="PackAndShip" partnerLinkType="ns6:PackAndShipProcess" partnerRole="PackAndShipProcessProvider"/>
+    <partnerLink name="ErrorHandler" partnerLinkType="ns7:ErrorProcess" partnerRole="ErrorProcessProvider"/>
+  </partnerLinks>
+
+  <!-- 
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      VARIABLES                                                        
+      List of messages and XML documents used within this BPEL process 
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  -->
+  <variables>
+    <!-- Reference to the message passed as input during initiation -->
+    <variable name="inputVariable" messageType="client:OrderFulfilProcessRequestMessage"/>
+    <variable name="ShippingMethod" type="xsd:decimal"/>
+    <variable name="getShipmentDetails_InputVariable" messageType="ns4:GetShipmentDetailsSelect_inputParameters"/>
+    <variable name="getShipmentDetails_OutputVariable" messageType="ns4:ShippingMethodsCollection_msg"/>
+    <variable name="PackAndShip_process_InputVariable" messageType="ns6:PackAndShipProcessRequestMessage"/>
+    <variable name="InvokeErrorHandler_process_InputVariable" messageType="ns7:ErrorProcessRequestMessage"/>
+  </variables>
+  <faultHandlers>
+    <catchAll>
+      <sequence name="Sequence2">
+        <assign name="AssignErrorDetails">
+          <copy>
+            <from>$inputVariable.payload/ns2:OrderNumber</from>
+            <to>$InvokeErrorHandler_process_InputVariable.payload/ns7:OrderNum</to>
+          </copy>
+          <copy>
+            <from>ora:getPreference('ProjectName')</from>
+            <to>$InvokeErrorHandler_process_InputVariable.payload/ns7:ProcessName</to>
+          </copy>
+          <copy>
+            <from>ora:getFaultAsString()</from>
+            <to>$InvokeErrorHandler_process_InputVariable.payload/ns7:ErrorMessage</to>
+          </copy>
+          <copy>
+            <from>"E"</from>
+            <to>$InvokeErrorHandler_process_InputVariable.payload/ns7:ErrorCode</to>
+          </copy>
+        </assign>
+        <invoke name="InvokeErrorHandler" partnerLink="ErrorHandler"
+                portType="ns7:ErrorProcess" operation="process"
+                inputVariable="InvokeErrorHandler_process_InputVariable" bpelx:invokeAsDetail="no"/>
+        <exit name="Exit1"/>
+      </sequence>
+    </catchAll>
+  </faultHandlers>
+  <!-- 
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+     ORCHESTRATION LOGIC                                               
+     Set of activities coordinating the flow of messages across the    
+     services integrated within this business process                  
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  -->
+  <sequence name="main">
+
+    <!-- Receive input from requestor. (Note: This maps to operation defined in OrderFulfilProcess.wsdl) -->
+    <receive name="receiveInput" partnerLink="orderfulfilprocess_client" portType="client:OrderFulfilProcess" operation="process" variable="inputVariable" createInstance="yes"/>
+    <scope name="DetermineShippingMethod">
+      <bpelx:annotation>
+        <bpelx:pattern patternName="bpelx:decide"></bpelx:pattern>
+      </bpelx:annotation>
+      <variables>
+        <variable name="dsIn" messageType="ns1:callFunctionStatelessMessage"/>
+        <variable name="dsOut" messageType="ns1:callFunctionStatelessDecisionMessage"/>
+      </variables>
+      <sequence name="Sequence1">
+        <assign name="Facts_To_Rule_Service">
+          <copy>
+            <from variable="inputVariable" part="payload"><query>ns2:Shipping</query></from>
+            <to variable="dsIn" part="payload"><query>ns1:parameterList/ns2:Shipping</query></to>
+          </copy>
+        </assign>
+        <assign name="BPEL_Header">
+          <copy>
+            <from>"DetermineShipmentMethod_DecisionService_1"</from>
+            <to variable="dsIn" part="payload"><query>@name</query></to>
+          </copy>
+        </assign>
+        <invoke name="Invoke" partnerLink="DetermineShipmentMethod.DetermineShipmentMethod_DecisionService_1"
+                portType="ns1:IDecisionService" operation="callFunctionStateless" inputVariable="dsIn"
+                outputVariable="dsOut"/>
+        <assign name="Rule_Service_To_Facts">
+          <copy>
+            <from variable="dsOut" part="payload"><query>ns1:resultList/ns2:Shipping/ns2:ShipMethod</query></from>
+            <to variable="ShippingMethod"/>
+          </copy>
+        </assign>
+      </sequence>
+    </scope>
+    <assign name="AssignShippingMethod">
+      <copy>
+        <from>$ShippingMethod</from>
+        <to>$getShipmentDetails_InputVariable.GetShipmentDetailsSelect_inputParameters/ns5:ShipmentMethod</to>
+      </copy>
+    </assign>
+    <invoke name="getShipmentDetails" partnerLink="GetShipmentDetails"
+            portType="ns4:GetShipmentDetails_ptt" operation="GetShipmentDetailsSelect"
+            inputVariable="getShipmentDetails_InputVariable" outputVariable="getShipmentDetails_OutputVariable"
+            bpelx:invokeAsDetail="no"/>
+    <assign name="AssignShippingDetails">
+      <copy>
+        <from>$inputVariable.payload/ns2:Shipping</from>
+        <to>$PackAndShip_process_InputVariable.payload</to>
+      </copy>
+      <copy>
+        <from>$getShipmentDetails_OutputVariable.ShippingMethodsCollection/ns5:ShippingMethods/ns5:providerId/ns5:name</from>
+        <to>$PackAndShip_process_InputVariable.payload/ns2:ShippingProvider/ns2:Name</to>
+      </copy>
+      <copy>
+        <from>$getShipmentDetails_OutputVariable.ShippingMethodsCollection/ns5:ShippingMethods/ns5:name</from>
+        <to>$PackAndShip_process_InputVariable.payload/ns2:ShipMethod</to>
+      </copy>
+    </assign>
+    <invoke name="PackAndShip" partnerLink="PackAndShip" portType="ns6:PackAndShipProcess"
+            operation="process" inputVariable="PackAndShip_process_InputVariable" bpelx:invokeAsDetail="no"/>
+  </sequence>
+</process>

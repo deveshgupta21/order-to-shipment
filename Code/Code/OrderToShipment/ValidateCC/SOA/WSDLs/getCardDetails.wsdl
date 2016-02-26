@@ -1,0 +1,32 @@
+<wsdl:definitions
+     name="getCardDetails"
+     targetNamespace="http://xmlns.oracle.com/pcbpel/adapter/db/OrderToShipment/ValidateCC/getCardDetails"
+     xmlns:tns="http://xmlns.oracle.com/pcbpel/adapter/db/OrderToShipment/ValidateCC/getCardDetails"
+     xmlns:jca="http://xmlns.oracle.com/pcbpel/wsdl/jca/"
+     xmlns:plt="http://schemas.xmlsoap.org/ws/2003/05/partner-link/"
+     xmlns:top="http://xmlns.oracle.com/pcbpel/adapter/db/top/getCardDetails"
+     xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+    >
+  <plt:partnerLinkType name="getCardDetails_plt" >
+    <plt:role name="getCardDetails_role" >
+      <plt:portType name="tns:getCardDetails_ptt" />
+    </plt:role>
+  </plt:partnerLinkType>
+    <wsdl:types>
+      <schema xmlns="http://www.w3.org/2001/XMLSchema" >
+        <import namespace="http://xmlns.oracle.com/pcbpel/adapter/db/top/getCardDetails" schemaLocation="../Schemas/getCardDetails_table.xsd" />
+      </schema>
+    </wsdl:types>
+    <wsdl:message name="getCardDetailsSelect_inputParameters">
+        <wsdl:part name="getCardDetailsSelect_inputParameters" element="top:getCardDetailsSelect_cnInputParameters"/>
+    </wsdl:message>
+    <wsdl:message name="CreditcarddetailsCollection_msg">
+        <wsdl:part name="CreditcarddetailsCollection" element="top:CreditcarddetailsCollection"/>
+    </wsdl:message>
+    <wsdl:portType name="getCardDetails_ptt">
+        <wsdl:operation name="getCardDetailsSelect">
+            <wsdl:input message="tns:getCardDetailsSelect_inputParameters"/>
+            <wsdl:output message="tns:CreditcarddetailsCollection_msg"/>
+        </wsdl:operation>
+    </wsdl:portType>
+</wsdl:definitions>

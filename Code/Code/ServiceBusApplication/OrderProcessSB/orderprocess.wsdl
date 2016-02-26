@@ -1,0 +1,35 @@
+<wsdl:definitions name="OrderProcess" targetNamespace="http://xmlns.oracle.com/OrderToShipment/OrderProcessing/OrderProcess" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:client="http://xmlns.oracle.com/OrderToShipment/OrderProcessing/OrderProcess" xmlns:ns1="http://www.oracle.com/soasample" xmlns:plnk="http://docs.oasis-open.org/wsbpel/2.0/plnktype" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
+    <wsdl:documentation>
+        <abstractWSDL>http://127.0.0.1:7101/soa-infra/services/default/OrderProcessing!1.0/WSDLs/OrderProcess.wsdl</abstractWSDL>
+    </wsdl:documentation>
+    <plnk:partnerLinkType name="OrderProcess">
+        <plnk:role name="OrderProcessProvider" portType="client:OrderProcess"/>
+    </plnk:partnerLinkType>
+    <wsdl:types>
+        <schema xmlns="http://www.w3.org/2001/XMLSchema">
+            <import namespace="http://www.oracle.com/soasample" schemaLocation="./Schema/CanonicalOrder.xsd"/>
+        </schema>
+    </wsdl:types>
+    <wsdl:message name="OrderProcessRequestMessage">
+        <wsdl:part name="payload" element="ns1:Order"/>
+    </wsdl:message>
+    <wsdl:portType name="OrderProcess">
+        <wsdl:operation name="process">
+            <wsdl:input message="client:OrderProcessRequestMessage"/>
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:binding name="OrderProcessBinding" type="client:OrderProcess">
+        <soap:binding transport="http://schemas.xmlsoap.org/soap/http"/>
+        <wsdl:operation name="process">
+            <soap:operation style="document" soapAction="process"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:service name="orderprocess_client_ep">
+        <wsdl:port name="OrderProcess_pt" binding="client:OrderProcessBinding">
+            <soap:address location="http://127.0.0.1:7001/soa-infra/services/default/OrderProcessing/orderprocess_client_ep"/>
+        </wsdl:port>
+    </wsdl:service>
+</wsdl:definitions>

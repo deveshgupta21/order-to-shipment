@@ -1,0 +1,13 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Faults>
+   <Fault>
+      <severity>warning</severity>
+      <loc>/ns:composite/ns:wire/ns:target.uri[.='ValidateCCProcess/ValidateCC']</loc>
+      <line>65</line>
+      <col>17</col>
+      <file>C:\Demo\OrderToShipment\ValidateCC\SOA\composite.xml</file>
+      <name>C:\Demo\OrderToShipment\ValidateCC\SOA\composite.xml</name>
+      <fix/>
+      <msg>Schema validation failed with exception "Invalid element 'element' in 'all'"</msg>
+   </Fault>
+</Faults>

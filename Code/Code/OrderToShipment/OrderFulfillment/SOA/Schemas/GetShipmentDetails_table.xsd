@@ -1,0 +1,28 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<xs:schema targetNamespace="http://xmlns.oracle.com/pcbpel/adapter/db/top/GetShipmentDetails" xmlns="http://xmlns.oracle.com/pcbpel/adapter/db/top/GetShipmentDetails" elementFormDefault="qualified" attributeFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+   <xs:element name="ShippingMethodsCollection" type="ShippingMethodsCollection"/>
+   <xs:complexType name="ShippingMethodsCollection">
+      <xs:sequence>
+         <xs:element name="ShippingMethods" type="ShippingMethods" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name="ShippingMethods">
+      <xs:sequence>
+         <xs:element name="methodsId" type="xs:decimal"/>
+         <xs:element name="name" type="xs:string" minOccurs="0" nillable="true"/>
+         <xs:element name="providerId" type="ShippingProviders" minOccurs="0" nillable="true"/>
+      </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name="ShippingProviders">
+      <xs:sequence>
+         <xs:element name="providerId" type="xs:decimal"/>
+         <xs:element name="name" type="xs:string" minOccurs="0" nillable="true"/>
+      </xs:sequence>
+   </xs:complexType>
+   <xs:element name="GetShipmentDetailsSelect_ShipmentMethodInputParameters" type="GetShipmentDetailsSelect_ShipmentMethod"/>
+   <xs:complexType name="GetShipmentDetailsSelect_ShipmentMethod">
+      <xs:sequence>
+         <xs:element name="ShipmentMethod" type="xs:decimal" minOccurs="1" maxOccurs="1"/>
+      </xs:sequence>
+   </xs:complexType>
+</xs:schema>

@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dgm:gDiagram xmlns:dgm="http://xmlns.oracle.com/sca/soadgm">
+    <dgm:gService name="PollOrderForFulfillment">
+        <dgm:body borderWidth="2" arcRad="20" X="21" Y="135" width="137" height="84">
+            <dgm:borderColor r="153" g="153" b="153"/>
+            <dgm:bgColor r="255" g="255" b="255"/>
+        </dgm:body>
+        <dgm:shadow arcRad="20" X="11" Y="128" width="156" height="98">
+            <dgm:bgColor r="196" g="228" b="240"/>
+        </dgm:shadow>
+        <dgm:outputPort name="PollOrderForFulfillment" X="127" Y="0" diameter="20" imageURI="oracle/tip/tools/ide/fabric/resource/image/visuals_rd1/servicereference.png" interface="http://xmlns.oracle.com/pcbpel/adapter/db/OrderToShipment/OrderFulfillment/PollOrderForFulfillment#wsdl.interface(PollOrderForFulfillment_ptt)"/>
+        <dgm:nodeIcon URI="/oracle/tip/tools/ide/adapters/designtime/adapter/images/db_adapter_20x20.png" X="20" Y="4" width="20" height="20"/>
+        <dgm:operations>
+            <dgm:item>receive</dgm:item>
+        </dgm:operations>
+    </dgm:gService>
+    <dgm:gReference name="GetShipmentDetails">
+        <dgm:body borderWidth="2" arcRad="20" X="956" Y="73" width="136" height="84">
+            <dgm:borderColor r="153" g="153" b="153"/>
+            <dgm:bgColor r="255" g="255" b="255"/>
+        </dgm:body>
+        <dgm:shadow arcRad="20" X="946" Y="66" width="156" height="98">
+            <dgm:bgColor r="196" g="228" b="240"/>
+        </dgm:shadow>
+        <dgm:inputPort name="GetShipmentDetails" X="-10" Y="0" diameter="20" imageURI="oracle/tip/tools/ide/fabric/resource/image/visuals_rd1/servicereference.png" interface="http://xmlns.oracle.com/pcbpel/adapter/db/OrderToShipment/OrderFulfillment/GetShipmentDetails#wsdl.interface(GetShipmentDetails_ptt)"/>
+        <dgm:nodeIcon URI="/oracle/tip/tools/ide/adapters/designtime/adapter/images/db_adapter_20x20.png" X="27" Y="4" width="20" height="20"/>
+        <dgm:operations>
+            <dgm:item>GetShipmentDetailsSelect</dgm:item>
+        </dgm:operations>
+    </dgm:gReference>
+    <dgm:gReference name="PackAndShip">
+        <dgm:body borderWidth="2" arcRad="20" X="956" Y="191" width="136" height="84">
+            <dgm:borderColor r="153" g="153" b="153"/>
+            <dgm:bgColor r="255" g="255" b="255"/>
+        </dgm:body>
+        <dgm:shadow arcRad="20" X="946" Y="184" width="156" height="98">
+            <dgm:bgColor r="196" g="228" b="240"/>
+        </dgm:shadow>
+        <dgm:inputPort name="PackAndShip" X="-10" Y="0" diameter="20" imageURI="oracle/tip/tools/ide/fabric/resource/image/visuals_rd1/servicereference.png" interface="http://xmlns.oracle.com/OrderToShipment/PackAndShip/PackAndShipProcess#wsdl.interface(PackAndShipProcess)"/>
+        <dgm:nodeIcon URI="/oracle/tip/tools/ide/adapters/designtime/adapter/images/soap_service_20x20.png" X="27" Y="4" width="20" height="20"/>
+        <dgm:operations>
+            <dgm:item>process</dgm:item>
+        </dgm:operations>
+    </dgm:gReference>
+    <dgm:gReference name="ErrorHandler">
+        <dgm:body borderWidth="2" arcRad="20" X="956" Y="309" width="136" height="84">
+            <dgm:borderColor r="153" g="153" b="153"/>
+            <dgm:bgColor r="255" g="255" b="255"/>
+        </dgm:body>
+        <dgm:shadow arcRad="20" X="946" Y="302" width="156" height="98">
+            <dgm:bgColor r="196" g="228" b="240"/>
+        </dgm:shadow>
+        <dgm:inputPort name="ErrorHandler" X="-10" Y="0" diameter="20" imageURI="oracle/tip/tools/ide/fabric/resource/image/visuals_rd1/servicereference.png" interface="http://xmlns.oracle.com/OrderToShipment/ErrorFramework/ErrorProcess#wsdl.interface(ErrorProcess)"/>
+        <dgm:nodeIcon URI="/oracle/tip/tools/ide/adapters/designtime/adapter/images/soap_service_20x20.png" X="27" Y="4" width="20" height="20"/>
+        <dgm:operations>
+            <dgm:item>process</dgm:item>
+        </dgm:operations>
+    </dgm:gReference>
+    <dgm:gComponent name="OrderFulfilProcess">
+        <dgm:body borderWidth="2" arcRad="20" X="492" Y="120" width="130" height="136">
+            <dgm:borderColor r="69" g="113" b="140"/>
+            <dgm:lightBgColor r="166" g="208" b="230"/>
+            <dgm:darkBgColor r="99" g="162" b="201"/>
+        </dgm:body>
+        <dgm:shadow arcRad="20" X="482" Y="113" width="150" height="152">
+            <dgm:bgColor r="196" g="228" b="240"/>
+        </dgm:shadow>
+        <dgm:inputPort name="orderfulfilprocess_client" X="-10" Y="15" diameter="20" imageURI="oracle/tip/tools/ide/fabric/resource/image/visuals_rd1/servicereference.png" interface="http://xmlns.oracle.com/OrderToShipment/OrderFulfillment/OrderFulfilProcess#wsdl.interface(OrderFulfilProcess)"/>
+        <dgm:outputPort name="DetermineShipmentMethod.DetermineShipmentMethod_DecisionService_1" X="120" Y="15" diameter="20" imageURI="oracle/tip/tools/ide/fabric/resource/image/visuals_rd1/servicereference.png" interface="http://xmlns.oracle.com/DetermineShipmentMethod/DetermineShipmentMethod_DecisionService_1#wsdl.interface(IDecisionService)"/>
+        <dgm:outputPort name="GetShipmentDetails" X="120" Y="40" diameter="20" imageURI="oracle/tip/tools/ide/fabric/resource/image/visuals_rd1/servicereference.png" interface="http://xmlns.oracle.com/pcbpel/adapter/db/OrderToShipment/OrderFulfillment/GetShipmentDetails#wsdl.interface(GetShipmentDetails_ptt)"/>
+        <dgm:outputPort name="PackAndShip" X="120" Y="65" diameter="20" imageURI="oracle/tip/tools/ide/fabric/resource/image/visuals_rd1/servicereference.png" interface="http://xmlns.oracle.com/OrderToShipment/PackAndShip/PackAndShipProcess#wsdl.interface(PackAndShipProcess)"/>
+        <dgm:outputPort name="ErrorHandler" X="120" Y="90" diameter="20" imageURI="oracle/tip/tools/ide/fabric/resource/image/visuals_rd1/servicereference.png" interface="http://xmlns.oracle.com/OrderToShipment/ErrorFramework/ErrorProcess#wsdl.interface(ErrorProcess)"/>
+        <dgm:nodeIcon URI="/oracle/tip/tools/ide/bpel/shared/plugins/resources/images/soa/process_20x20.png" X="10" Y="4" width="20" height="20"/>
+    </dgm:gComponent>
+    <dgm:gComponent name="OrderFulfillRouter">
+        <dgm:body borderWidth="2" arcRad="20" X="260" Y="120" width="130" height="61">
+            <dgm:borderColor r="128" g="92" b="148"/>
+            <dgm:lightBgColor r="208" g="169" b="227"/>
+            <dgm:darkBgColor r="183" g="132" b="212"/>
+        </dgm:body>
+        <dgm:shadow arcRad="20" X="250" Y="113" width="150" height="77">
+            <dgm:bgColor r="196" g="228" b="240"/>
+        </dgm:shadow>
+        <dgm:inputPort name="OrderFulfillRouter" X="-10" Y="15" diameter="20" imageURI="oracle/tip/tools/ide/fabric/resource/image/visuals_rd1/servicereference.png" interface="http://xmlns.oracle.com/pcbpel/adapter/db/OrderToShipment/OrderFulfillment/PollOrderForFulfillment#wsdl.interface(PollOrderForFulfillment_ptt)"/>
+        <dgm:outputPort name="OrderFulfilProcess.orderfulfilprocess_client" X="120" Y="15" diameter="20" imageURI="oracle/tip/tools/ide/fabric/resource/image/visuals_rd1/servicereference.png" interface="http://xmlns.oracle.com/OrderToShipment/OrderFulfillment/OrderFulfilProcess#wsdl.interface(OrderFulfilProcess)"/>
+        <dgm:nodeIcon URI="/oracle/tip/tools/ide/mediator/resource/image/mediator_20x20.png" X="10" Y="4" width="20" height="20"/>
+    </dgm:gComponent>
+    <dgm:gComponent name="DetermineShipmentMethod">
+        <dgm:body borderWidth="2" arcRad="20" X="724" Y="26" width="130" height="61">
+            <dgm:borderColor r="178" g="138" b="53"/>
+            <dgm:lightBgColor r="255" g="226" b="142"/>
+            <dgm:darkBgColor r="255" g="198" b="77"/>
+        </dgm:body>
+        <dgm:shadow arcRad="20" X="714" Y="19" width="150" height="77">
+            <dgm:bgColor r="196" g="228" b="240"/>
+        </dgm:shadow>
+        <dgm:inputPort name="DetermineShipmentMethod_DecisionService_1" X="-10" Y="15" diameter="20" imageURI="oracle/tip/tools/ide/fabric/resource/image/visuals_rd1/servicereference.png" interface="http://xmlns.oracle.com/DetermineShipmentMethod/DetermineShipmentMethod_DecisionService_1#wsdl.interface(IDecisionService)"/>
+        <dgm:nodeIcon URI="/oracle/tip/tools/ide/rules/plugins/resources/images/soa/decision_20x20.png" X="10" Y="4" width="20" height="20"/>
+    </dgm:gComponent>
+    <dgm:gWireLink source="PollOrderForFulfillment" target="OrderFulfillRouter/OrderFulfillRouter" width="2">
+        <dgm:gSegment X1="168" Y1="145" X2="250" Y2="145"/>
+        <dgm:baseColor r="153" g="153" b="153"/>
+        <dgm:selectedColor r="49" g="106" b="196"/>
+    </dgm:gWireLink>
+    <dgm:gWireLink source="OrderFulfillRouter/OrderFulfilProcess.orderfulfilprocess_client" target="OrderFulfilProcess/orderfulfilprocess_client" width="2">
+        <dgm:gSegment X1="400" Y1="145" X2="482" Y2="145"/>
+        <dgm:baseColor r="153" g="153" b="153"/>
+        <dgm:selectedColor r="49" g="106" b="196"/>
+    </dgm:gWireLink>
+    <dgm:gWireLink source="OrderFulfilProcess/DetermineShipmentMethod.DetermineShipmentMethod_DecisionService_1" target="DetermineShipmentMethod/DetermineShipmentMethod_DecisionService_1" width="2">
+        <dgm:gSegment X1="632" Y1="145" X2="656" Y2="145"/>
+        <dgm:gSegment X1="656" Y1="145" X2="656" Y2="51"/>
+        <dgm:gSegment X1="656" Y1="51" X2="714" Y2="51"/>
+        <dgm:baseColor r="153" g="153" b="153"/>
+        <dgm:selectedColor r="49" g="106" b="196"/>
+    </dgm:gWireLink>
+    <dgm:gWireLink source="OrderFulfilProcess/GetShipmentDetails" target="GetShipmentDetails" width="2">
+        <dgm:gSegment X1="632" Y1="170" X2="888" Y2="170"/>
+        <dgm:gSegment X1="888" Y1="170" X2="888" Y2="83"/>
+        <dgm:gSegment X1="888" Y1="83" X2="946" Y2="83"/>
+        <dgm:baseColor r="153" g="153" b="153"/>
+        <dgm:selectedColor r="49" g="106" b="196"/>
+    </dgm:gWireLink>
+    <dgm:gWireLink source="OrderFulfilProcess/PackAndShip" target="PackAndShip" width="2">
+        <dgm:gSegment X1="632" Y1="195" X2="656" Y2="195"/>
+        <dgm:gSegment X1="656" Y1="195" X2="656" Y2="201"/>
+        <dgm:gSegment X1="656" Y1="201" X2="946" Y2="201"/>
+        <dgm:baseColor r="153" g="153" b="153"/>
+        <dgm:selectedColor r="49" g="106" b="196"/>
+    </dgm:gWireLink>
+    <dgm:gWireLink source="OrderFulfilProcess/ErrorHandler" target="ErrorHandler" width="2">
+        <dgm:gSegment X1="632" Y1="220" X2="656" Y2="220"/>
+        <dgm:gSegment X1="656" Y1="220" X2="656" Y2="319"/>
+        <dgm:gSegment X1="656" Y1="319" X2="946" Y2="319"/>
+        <dgm:baseColor r="153" g="153" b="153"/>
+        <dgm:selectedColor r="49" g="106" b="196"/>
+    </dgm:gWireLink>
+</dgm:gDiagram>

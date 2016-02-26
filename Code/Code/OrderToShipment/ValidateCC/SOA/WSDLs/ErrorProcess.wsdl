@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions
+     name="ErrorProcess"
+     targetNamespace="http://xmlns.oracle.com/OrderToShipment/ErrorFramework/ErrorProcess"
+     xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+     xmlns:client="http://xmlns.oracle.com/OrderToShipment/ErrorFramework/ErrorProcess"
+     xmlns:plnk="http://docs.oasis-open.org/wsbpel/2.0/plnktype"
+     xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+    >
+    <wsdl:documentation>
+        <abstractWSDL>http://127.0.0.1:7001/soa-infra/services/default/ErrorFramework!1.0/WSDLs/ErrorProcess.wsdl</abstractWSDL>
+    </wsdl:documentation>
+    <plnk:partnerLinkType name="ErrorProcess">
+        <plnk:role name="ErrorProcessProvider" portType="client:ErrorProcess"/>
+    </plnk:partnerLinkType>
+    <wsdl:types>
+        <schema xmlns="http://www.w3.org/2001/XMLSchema">
+            <import namespace="http://xmlns.oracle.com/OrderToShipment/ErrorFramework/ErrorProcess"
+                 schemaLocation="http://127.0.0.1:7001/soa-infra/services/default/ErrorFramework/errorprocess_client_ep?XSD=../Schemas/ErrorProcess.xsd"/>
+        </schema>
+    </wsdl:types>
+    <wsdl:message name="ErrorProcessRequestMessage">
+        <wsdl:part name="payload" element="client:process"/>
+    </wsdl:message>
+    <wsdl:portType name="ErrorProcess">
+        <wsdl:operation name="process">
+            <wsdl:input message="client:ErrorProcessRequestMessage"/>
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:binding name="ErrorProcessBinding" type="client:ErrorProcess">
+        <soap:binding transport="http://schemas.xmlsoap.org/soap/http"/>
+        <wsdl:operation name="process">
+            <soap:operation style="document" soapAction="process"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:service name="errorprocess_client_ep">
+        <wsdl:port name="ErrorProcess_pt" binding="client:ErrorProcessBinding">
+            <soap:address location="http://127.0.0.1:7001/soa-infra/services/default/ErrorFramework/errorprocess_client_ep"/>
+        </wsdl:port>
+    </wsdl:service>
+</wsdl:definitions>

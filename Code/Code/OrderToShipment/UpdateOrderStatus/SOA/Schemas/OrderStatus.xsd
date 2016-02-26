@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="windows-1252" ?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://www.home.com/xsd/orderstatus"
+            targetNamespace="http://www.home.com/xsd/orderstatus" elementFormDefault="qualified">
+   <xs:element name="OrderStatus" type="OrderStatusType"/>
+   <xs:complexType name="OrderStatusType">
+      <xs:sequence>
+         <xs:element name="OrderNum" type="xs:string" minOccurs="0" />
+          <xs:element name="Status" type="xs:string" minOccurs="0"/>
+      </xs:sequence>
+   </xs:complexType>
+</xs:schema>

@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SOAConfigPlan xmlns:jca="http://platform.integration.oracle/blocks/adapter/fw/metadata" xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy" xmlns:orawsp="http://schemas.oracle.com/ws/2006/01/policy" xmlns:edl="http://schemas.oracle.com/events/edl" xmlns="http://schemas.oracle.com/soa/configplan">
+   <composite name="OrderFulfillment">
+      <!--Add search and replace rules for the import section of a composite
+	Example:
+	<searchReplace>
+		<search>http://my-dev-server</search>
+		<replace>http://my-test-server</replace>
+	<searchReplace>
+	<searchReplace>
+		<search>8888</search>
+		<replace>8889</replace>
+	<searchReplace>-->
+      <import>
+         <searchReplace>
+            <search/>
+            <replace/>
+         </searchReplace>
+      </import>
+      <!--Add search and replace rules for the service properties-->
+      <service name="PollOrderForFulfillment">
+         <property name="jca.retry.count">
+            <replace>2147483647</replace>
+         </property>
+         <property name="jca.retry.interval">
+            <replace>1</replace>
+         </property>
+         <property name="jca.retry.backoff">
+            <replace>2</replace>
+         </property>
+         <property name="jca.retry.maxInterval">
+            <replace>120</replace>
+         </property>
+         <!--Add search and replace rules for the binding properties-->
+         <binding type="jca">
+            <property name="useRejectedMessageRecovery">
+               <replace>true</replace>
+            </property>
+         </binding>
+      </service>
+      <service name="orderfulfilprocess_client"/>
+      <service name="OrderFulfillRouter"/>
+      <service name="DetermineShipmentMethod_DecisionService_1"/>
+      <property name="productVersion">
+         <replace>12.1.3.0.0</replace>
+      </property>
+      <property name="compositeID">
+         <replace>eb0380bc-c8b4-4c51-928a-fed2d093cd35</replace>
+      </property>
+      <property name="oracle.composite.faultPolicyFile">
+         <replace>oramds:/apps/soa/FaultPolicy/fault-policies.xml</replace>
+      </property>
+      <property name="oracle.composite.faultBindingFile">
+         <replace>oramds:/apps/soa/FaultPolicy/fault-bindings.xml</replace>
+      </property>
+      <!--Add search and replace rules for the component properties
+	For components and service/reference bindings, you can add policy references.
+	Example:
+	<component name="*">
+		<wsp:PolicyReference orawsp:category="management" orawsp:status="enabled" URI="oracle/log_policy"/>
+	</component>-->
+      <component name="OrderFulfilProcess">
+         <property name="bpel.config.oneWayDeliveryPolicy">
+            <replace>async.persist</replace>
+         </property>
+         <property name="bpel.preference.ProjectName">
+            <replace>OrderFulfillment</replace>
+         </property>
+      </component>
+      <reference name="DetermineShipmentMethod.DetermineShipmentMethod_DecisionService_1"/>
+      <reference name="GetShipmentDetails"/>
+      <reference name="PackAndShip"/>
+      <reference name="ErrorHandler"/>
+      <reference name="OrderFulfilProcess.orderfulfilprocess_client"/>
+      <reference name="GetShipmentDetails">
+         <property name="jca.retry.count">
+            <replace>4</replace>
+         </property>
+         <property name="jca.retry.interval">
+            <replace>1</replace>
+         </property>
+         <property name="jca.retry.backoff">
+            <replace>2</replace>
+         </property>
+         <property name="jca.retry.maxInterval">
+            <replace>120</replace>
+         </property>
+         <binding type="jca"/>
+      </reference>
+      <reference name="PackAndShip">
+         <!--Add search and replace rules for the binding properties-->
+         <binding type="ws">
+            <attribute name="port">
+               <replace>http://xmlns.oracle.com/OrderToShipment/PackAndShip/PackAndShipProcess#wsdl.endpoint(packandshipprocess_client_ep/PackAndShipProcess_pt)</replace>
+            </attribute>
+            <attribute name="location">
+               <replace>http://127.0.0.1:7001/soa-infra/services/default/PackAndShip/packandshipprocess_client_ep?WSDL</replace>
+            </attribute>
+            <property name="weblogic.wsee.wsat.transaction.flowOption">
+               <replace>WSDLDriven</replace>
+            </property>
+         </binding>
+      </reference>
+      <reference name="ErrorHandler">
+         <!--Add search and replace rules for the binding properties-->
+         <binding type="ws">
+            <attribute name="port">
+               <replace>http://xmlns.oracle.com/OrderToShipment/ErrorFramework/ErrorProcess#wsdl.endpoint(errorprocess_client_ep/ErrorProcess_pt)</replace>
+            </attribute>
+            <attribute name="location">
+               <replace>oramds:/apps/soa/WSDL/ErrorProcess.wsdl</replace>
+            </attribute>
+            <property name="weblogic.wsee.wsat.transaction.flowOption">
+               <replace>WSDLDriven</replace>
+            </property>
+         </binding>
+      </reference>
+   </composite>
+   <!--To configure monitor.config: 
+	<property name="enabled"><replace>true</replace></property>
+	<property name="dataObjectsFolder"><searchReplace><search>mydev</search><replace>myproduction</replace></searchReplace></property>
+	
+	sample properties to configure for adapter: 
+	<jca:property name="QueueName"><replace>medmq1</replace></jca:property>
+	
+	To add search and replace rules for wsdls, xsd and jca files
+	Example:
+	<searchReplace>
+		<search>http://my-dev-server</search>
+		<replace>http://my-test-server</replace>
+	<searchReplace>
+	<searchReplace>
+		<search>8888</search>
+		<replace>8889</replace>
+	<searchReplace>
+	-->
+   <wsdlAndSchema name="Adapters/GetShipmentDetails_db.jca|Adapters/PollOrderForFulfillment_db.jca|Schemas/DecisionServicePrimitiveTypes.xsd|Schemas/DetermineShipmentMethod_DecisionService_1MessageTypes.xsd|Schemas/DetermineShipmentMethod_DecisionService_1Types.xsd|Schemas/GetShipmentDetails_table.xsd|Schemas/PollOrderForFulfillment_table.xsd|WSDLs/DetermineShipmentMethod_DecisionService_1.wsdl|WSDLs/DetermineShipmentMethod_DecisionService_1Wrapper.wsdl|WSDLs/ErrorProcess.wsdl|WSDLs/GetShipmentDetails.wsdl|WSDLs/OrderFulfilProcess.wsdl|WSDLs/PackAndShipProcess.wsdl|WSDLs/PollOrderForFulfillment.wsdl">
+      <searchReplace>
+         <search/>
+         <replace/>
+      </searchReplace>
+   </wsdlAndSchema>
+</SOAConfigPlan>

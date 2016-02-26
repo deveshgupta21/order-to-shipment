@@ -1,0 +1,33 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Faults>
+   <Fault>
+      <severity>warning</severity>
+      <loc/>
+      <line>164</line>
+      <col/>
+      <file>BPEL/OrderFulfilProcess.bpel</file>
+      <name>BPEL/OrderFulfilProcess.bpel</name>
+      <fix>Add a predicate to select an element from the sequence.</fix>
+      <msg>The XPath segment "child::ns5:ShippingMethods" selects a sequence of elements - a predicate MAY be needed to correctly select an element.</msg>
+   </Fault>
+   <Fault>
+      <severity>warning</severity>
+      <loc/>
+      <line>168</line>
+      <col/>
+      <file>BPEL/OrderFulfilProcess.bpel</file>
+      <name>BPEL/OrderFulfilProcess.bpel</name>
+      <fix>Add a predicate to select an element from the sequence.</fix>
+      <msg>The XPath segment "child::ns5:ShippingMethods" selects a sequence of elements - a predicate MAY be needed to correctly select an element.</msg>
+   </Fault>
+   <Fault>
+      <severity>warning</severity>
+      <loc>/ns:composite/ns:wire/ns:target.uri[.='GetShipmentDetails']</loc>
+      <line>126</line>
+      <col>17</col>
+      <file>C:\Demo\OrderToShipment\OrderFulfillment\SOA\composite.xml</file>
+      <name>C:\Demo\OrderToShipment\OrderFulfillment\SOA\composite.xml</name>
+      <fix/>
+      <msg>Schema validation failed with exception "Invalid element 'element' in 'all'"</msg>
+   </Fault>
+</Faults>

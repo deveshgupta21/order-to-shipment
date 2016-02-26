@@ -1,0 +1,14 @@
+<adapter-config name="GetShipmentDetails" adapter="db" wsdlLocation="../WSDLs/GetShipmentDetails.wsdl" xmlns="http://platform.integration.oracle/blocks/adapter/fw/metadata">
+  
+  <connection-factory UIConnectionName="LocalXE" location="eis/DB/LocalXE"/>
+  <endpoint-interaction portType="GetShipmentDetails_ptt" operation="GetShipmentDetailsSelect">
+    <interaction-spec className="oracle.tip.adapter.db.DBReadInteractionSpec">
+      <property name="DescriptorName" value="GetShipmentDetails.ShippingMethods"/>
+      <property name="QueryName" value="GetShipmentDetailsSelect"/>
+      <property name="MappingsMetaDataURL" value="GetShipmentDetails-or-mappings.xml"/>
+      <property name="ReturnSingleResultSet" value="false"/>
+      <property name="GetActiveUnitOfWork" value="false"/>
+    </interaction-spec>
+  </endpoint-interaction>
+
+</adapter-config>

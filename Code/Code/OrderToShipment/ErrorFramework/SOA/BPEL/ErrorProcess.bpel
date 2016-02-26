@@ -1,0 +1,87 @@
+<?xml version = "1.0" encoding = "UTF-8" ?>
+<!--
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  Oracle JDeveloper BPEL Designer 
+  
+  Created: Sun Feb 21 18:28:22 IST 2016
+  Author:  devegupta
+  Type: BPEL 2.0 Process
+  Purpose: One Way BPEL Process
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+-->
+<process name="ErrorProcess"
+               targetNamespace="http://xmlns.oracle.com/OrderToShipment/ErrorFramework/ErrorProcess"
+               xmlns="http://docs.oasis-open.org/wsbpel/2.0/process/executable"
+               xmlns:client="http://xmlns.oracle.com/OrderToShipment/ErrorFramework/ErrorProcess"
+               xmlns:ora="http://schemas.oracle.com/xpath/extension"
+               xmlns:ui="http://xmlns.oracle.com/soa/designer"
+               xmlns:bpel="http://docs.oasis-open.org/wsbpel/2.0/process/executable"
+         xmlns:ns1="http://xmlns.oracle.com/pcbpel/adapter/ums/OrderToShipment/ErrorFramework/NotifyAdmin"
+         xmlns:bpelx="http://schemas.oracle.com/bpel/extension"
+         xmlns:xp20="http://www.oracle.com/XSL/Transform/java/oracle.tip.pc.services.functions.Xpath20"
+         xmlns:bpws="http://schemas.xmlsoap.org/ws/2003/03/business-process/"
+         xmlns:oraext="http://www.oracle.com/XSL/Transform/java/oracle.tip.pc.services.functions.ExtFunc"
+         xmlns:dvm="http://www.oracle.com/XSL/Transform/java/oracle.tip.dvm.LookupValue"
+         xmlns:hwf="http://xmlns.oracle.com/bpel/workflow/xpath"
+         xmlns:ids="http://xmlns.oracle.com/bpel/services/IdentityService/xpath"
+         xmlns:bpm="http://xmlns.oracle.com/bpmn20/extensions" xmlns:ess="http://xmlns.oracle.com/scheduler"
+         xmlns:xdk="http://schemas.oracle.com/bpel/extension/xpath/function/xdk"
+         xmlns:xref="http://www.oracle.com/XSL/Transform/java/oracle.tip.xref.xpath.XRefXPathFunctions"
+         xmlns:ldap="http://schemas.oracle.com/xpath/extension/ldap"
+         xmlns:ns2="http://platform.integration.oracle/blocks/adapter/fw/metadata/NotifyAdmin">
+
+  <import ui:processWSDL="true" namespace="http://xmlns.oracle.com/OrderToShipment/ErrorFramework/ErrorProcess" location="../WSDLs/ErrorProcess.wsdl" importType="http://schemas.xmlsoap.org/wsdl/"/>
+  <!-- 
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      PARTNERLINKS                                                      
+      List of services participating in this BPEL process               
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  --> 
+  <partnerLinks>
+    <!-- 
+      The 'client' role represents the requester of this service. It is 
+      used for callback. The location and correlation information associated
+      with the client role are automatically set using WS-Addressing.
+    -->
+    <partnerLink name="errorprocess_client" partnerLinkType="client:ErrorProcess" myRole="ErrorProcessProvider"/>
+    <partnerLink name="NotifyAdmin" partnerLinkType="ns1:SendNotification_plt" partnerRole="SendNotification_role"/>
+  </partnerLinks>
+
+  <!-- 
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      VARIABLES                                                        
+      List of messages and XML documents used within this BPEL process 
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  -->
+  <variables>
+    <!-- Reference to the message passed as input during initiation -->
+    <variable name="inputVariable" messageType="client:ErrorProcessRequestMessage"/>
+    <variable name="NotifyAdmin_SendNotification_InputVariable" messageType="ns1:SendNotification_msg"/>
+  </variables>
+  <faultHandlers>
+    <catchAll>
+      <exit name="Exit1"/>
+    </catchAll>
+  </faultHandlers>
+  <!-- 
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+     ORCHESTRATION LOGIC                                               
+     Set of activities coordinating the flow of messages across the    
+     services integrated within this business process                  
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  -->
+  <sequence name="main">
+
+    <!-- Receive input from requestor. (Note: This maps to operation defined in ErrorProcess.wsdl) -->
+    <receive name="receiveInput" partnerLink="errorprocess_client" portType="client:ErrorProcess" operation="process" variable="inputVariable" createInstance="yes"/>
+    <assign name="AssignAdminDetails">
+      <copy>
+        <from>concat("Hello Admin Team ", "Process Name: ",$inputVariable.payload/client:ProcessName," got error out for order# ",  $inputVariable.payload/client:OrderNum,". Please look into it as soon as possible")</from>
+        <to>$NotifyAdmin_SendNotification_InputVariable.body/ns2:payload</to>
+      </copy>
+    </assign>
+    <invoke name="NotifyAdmin" partnerLink="NotifyAdmin" portType="ns1:SendNotification_ptt"
+            operation="SendNotification" inputVariable="NotifyAdmin_SendNotification_InputVariable"
+            bpelx:invokeAsDetail="no"/>
+  </sequence>
+</process>

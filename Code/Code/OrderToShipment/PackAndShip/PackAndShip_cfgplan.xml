@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SOAConfigPlan xmlns:jca="http://platform.integration.oracle/blocks/adapter/fw/metadata" xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy" xmlns:orawsp="http://schemas.oracle.com/ws/2006/01/policy" xmlns:edl="http://schemas.oracle.com/events/edl" xmlns="http://schemas.oracle.com/soa/configplan">
+   <composite name="PackAndShip">
+      <!--Add search and replace rules for the import section of a composite
+	Example:
+	<searchReplace>
+		<search>http://my-dev-server</search>
+		<replace>http://my-test-server</replace>
+	<searchReplace>
+	<searchReplace>
+		<search>8888</search>
+		<replace>8889</replace>
+	<searchReplace>-->
+      <import>
+         <searchReplace>
+            <search/>
+            <replace/>
+         </searchReplace>
+      </import>
+      <service name="packandshipprocess_client_ep">
+         <binding type="ws">
+            <attribute name="port">
+               <replace>http://xmlns.oracle.com/OrderToShipment/PackAndShip/PackAndShipProcess#wsdl.endpoint(packandshipprocess_client_ep/PackAndShipProcess_pt)</replace>
+            </attribute>
+         </binding>
+      </service>
+      <service name="ReadShipmentConfirmation">
+         <!--Add search and replace rules for the binding properties-->
+         <binding type="jca">
+            <property name="useRejectedMessageRecovery">
+               <replace>true</replace>
+            </property>
+         </binding>
+      </service>
+      <service name="packandshipprocess_client"/>
+      <service name="ReadShipmentConfirmation"/>
+      <property name="productVersion">
+         <replace>12.1.3.0.0</replace>
+      </property>
+      <property name="compositeID">
+         <replace>e92f3af6-eaa5-4e9e-beb6-e261fd649c4a</replace>
+      </property>
+      <property name="oracle.composite.faultPolicyFile">
+         <replace>oramds:/apps/soa/FaultPolicy/fault-policies.xml</replace>
+      </property>
+      <property name="oracle.composite.faultBindingFile">
+         <replace>oramds:/apps/soa/FaultPolicy/fault-bindings.xml</replace>
+      </property>
+      <!--Add search and replace rules for the component properties
+	For components and service/reference bindings, you can add policy references.
+	Example:
+	<component name="*">
+		<wsp:PolicyReference orawsp:category="management" orawsp:status="enabled" URI="oracle/log_policy"/>
+	</component>-->
+      <component name="PackAndShipProcess">
+         <property name="bpel.config.oneWayDeliveryPolicy">
+            <replace>async.persist</replace>
+         </property>
+         <property name="bpel.preference.ProjectName">
+            <replace>PackAndShip</replace>
+         </property>
+      </component>
+      <component name="ShipmentConfirmationProcess">
+         <property name="bpel.config.transaction">
+            <replace>required</replace>
+         </property>
+         <property name="bpel.config.oneWayDeliveryPolicy">
+            <replace>sync</replace>
+         </property>
+         <property name="bpel.preference.ProjectName">
+            <replace>ShipmentConfirmationProcess</replace>
+         </property>
+      </component>
+      <reference name="WriteShipingDetails"/>
+      <reference name="ErrorHandler"/>
+      <reference name="StatusUpdate"/>
+      <reference name="NotifyCustomer"/>
+      <reference name="StatusUpdate"/>
+      <reference name="ErrorHandler"/>
+      <reference name="WriteShipingDetails">
+         <binding type="jca"/>
+      </reference>
+      <reference name="StatusUpdate">
+         <property name="jca.retry.count">
+            <replace>4</replace>
+         </property>
+         <property name="jca.retry.interval">
+            <replace>1</replace>
+         </property>
+         <property name="jca.retry.backoff">
+            <replace>2</replace>
+         </property>
+         <property name="jca.retry.maxInterval">
+            <replace>120</replace>
+         </property>
+         <binding type="jca"/>
+      </reference>
+      <reference name="NotifyCustomer">
+         <binding type="jca"/>
+      </reference>
+      <reference name="ErrorHandler">
+         <!--Add search and replace rules for the binding properties-->
+         <binding type="ws">
+            <attribute name="port">
+               <replace>http://xmlns.oracle.com/OrderToShipment/ErrorFramework/ErrorProcess#wsdl.endpoint(errorprocess_client_ep/ErrorProcess_pt)</replace>
+            </attribute>
+            <attribute name="location">
+               <replace>oramds:/apps/soa/WSDL/ErrorProcess.wsdl</replace>
+            </attribute>
+            <property name="weblogic.wsee.wsat.transaction.flowOption">
+               <replace>WSDLDriven</replace>
+            </property>
+         </binding>
+      </reference>
+   </composite>
+   <!--To configure monitor.config: 
+	<property name="enabled"><replace>true</replace></property>
+	<property name="dataObjectsFolder"><searchReplace><search>mydev</search><replace>myproduction</replace></searchReplace></property>
+	
+	sample properties to configure for file/ftp adapter: 
+	<jca:property name="PhysicalDirectory"><replace>c:\temp</replace></jca:property>
+	<jca:property name="DeleteFile"><replace>true</replace></jca:property>
+	<jca:property name="PollingFrequency"><replace>3</replace></jca:property>
+	
+	To add search and replace rules for wsdls, xsd and jca files
+	Example:
+	<searchReplace>
+		<search>http://my-dev-server</search>
+		<replace>http://my-test-server</replace>
+	<searchReplace>
+	<searchReplace>
+		<search>8888</search>
+		<replace>8889</replace>
+	<searchReplace>
+	-->
+   <wsdlAndSchema name="Adapters/NotifyCustomer_ums.jca|Adapters/ReadShipmentConfirmation_file.jca|Adapters/StatusUpdate_db.jca|Adapters/WriteShipingDetails_file.jca|Schemas/NotifyCustomer.xsd|Schemas/nXSD_Order.xsd|Schemas/nxsd_schema1.xsd|Schemas/StatusUpdate_table.xsd|WSDLs/ErrorProcess.wsdl|WSDLs/NotifyCustomer.wsdl|WSDLs/PackAndShipProcess.wsdl|WSDLs/ReadShipmentConfirmation.wsdl|WSDLs/StatusUpdate.wsdl|WSDLs/WriteShipingDetails.wsdl">
+      <searchReplace>
+         <search/>
+         <replace/>
+      </searchReplace>
+   </wsdlAndSchema>
+</SOAConfigPlan>

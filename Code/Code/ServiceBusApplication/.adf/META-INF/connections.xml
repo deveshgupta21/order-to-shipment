@@ -1,0 +1,27 @@
+<References xmlns="http://xmlns.oracle.com/adf/jndi">
+  <Reference name="Connection1" className="oracle.jdeveloper.db.adapter.DatabaseProvider"
+             credentialStoreKey="Connection1" xmlns="">
+    <Factory className="oracle.jdevimpl.db.adapter.DatabaseProviderFactory1212"/>
+    <RefAddresses>
+      <StringRefAddr addrType="subtype">
+        <Contents>MYSQL</Contents>
+      </StringRefAddr>
+      <StringRefAddr addrType="user">
+        <Contents>fmdev</Contents>
+      </StringRefAddr>
+      <StringRefAddr addrType="port">
+        <Contents>3306</Contents>
+      </StringRefAddr>
+      <StringRefAddr addrType="hostname">
+        <Contents>idm-lt-script-1.vmware.com</Contents>
+      </StringRefAddr>
+      <SecureRefAddr addrType="password"/>
+      <StringRefAddr addrType="dataSourceName">
+        <Contents>idm</Contents>
+      </StringRefAddr>
+      <StringRefAddr addrType="driver">
+        <Contents>com.mysql.jdbc.Driver</Contents>
+      </StringRefAddr>
+    </RefAddresses>
+  </Reference>
+</References>

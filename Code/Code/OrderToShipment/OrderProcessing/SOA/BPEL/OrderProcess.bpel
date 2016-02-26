@@ -1,0 +1,214 @@
+<?xml version = "1.0" encoding = "UTF-8" ?>
+<!--
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  Oracle JDeveloper BPEL Designer 
+  
+  Created: Fri Feb 19 21:50:15 IST 2016
+  Author:  devegupta
+  Type: BPEL 2.0 Process
+  Purpose: One Way BPEL Process
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+-->
+<process name="OrderProcess"
+               targetNamespace="http://xmlns.oracle.com/OrderToShipment/OrderProcessing/OrderProcess"
+               xmlns="http://docs.oasis-open.org/wsbpel/2.0/process/executable"
+               xmlns:client="http://xmlns.oracle.com/OrderToShipment/OrderProcessing/OrderProcess"
+               xmlns:ora="http://schemas.oracle.com/xpath/extension"
+               xmlns:ui="http://xmlns.oracle.com/soa/designer"
+               xmlns:bpel="http://docs.oasis-open.org/wsbpel/2.0/process/executable"
+         xmlns:ns1="http://xmlns.oracle.com/pcbpel/adapter/db/OrderToShipment/OrderProcessing/OrderToDB"
+         xmlns:ns2="http://xmlns.oracle.com/ServiceBusApplication/ValidateCC/ValidateCrCard"
+         xmlns:ns3="http://xmlns.oracle.com/OrderToShipment/UpdateOrderStatus/OrderStatusRouter"
+         xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:bpelx="http://schemas.oracle.com/bpel/extension"
+         xmlns:ns4="http://www.oracle.com/soasample" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns:xp20="http://www.oracle.com/XSL/Transform/java/oracle.tip.pc.services.functions.Xpath20"
+         xmlns:bpws="http://schemas.xmlsoap.org/ws/2003/03/business-process/"
+         xmlns:oraext="http://www.oracle.com/XSL/Transform/java/oracle.tip.pc.services.functions.ExtFunc"
+         xmlns:dvm="http://www.oracle.com/XSL/Transform/java/oracle.tip.dvm.LookupValue"
+         xmlns:hwf="http://xmlns.oracle.com/bpel/workflow/xpath"
+         xmlns:ids="http://xmlns.oracle.com/bpel/services/IdentityService/xpath"
+         xmlns:bpm="http://xmlns.oracle.com/bpmn20/extensions" xmlns:ess="http://xmlns.oracle.com/scheduler"
+         xmlns:xdk="http://schemas.oracle.com/bpel/extension/xpath/function/xdk"
+         xmlns:xref="http://www.oracle.com/XSL/Transform/java/oracle.tip.xref.xpath.XRefXPathFunctions"
+         xmlns:ldap="http://schemas.oracle.com/xpath/extension/ldap"
+         xmlns:sp1="http://xmlns.oracle.com/OrderToShipment/OrderProcessing/UpdateStatus"
+         xmlns:ns5="http://xmlns.oracle.com/OrderToShipment/ErrorFramework/ErrorProcess">
+  <import namespace="http://www.oracle.com/soasample" location="oramds:/apps/soa/Schemas/CanonicalOrder.xsd"
+          importType="http://www.w3.org/2001/XMLSchema"/>
+  <import ui:processWSDL="true" namespace="http://xmlns.oracle.com/OrderToShipment/OrderProcessing/OrderProcess" location="../WSDLs/OrderProcess.wsdl" importType="http://schemas.xmlsoap.org/wsdl/"/>
+  <!-- 
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      PARTNERLINKS                                                      
+      List of services participating in this BPEL process               
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  --> 
+  <partnerLinks>
+    <!-- 
+      The 'client' role represents the requester of this service. It is 
+      used for callback. The location and correlation information associated
+      with the client role are automatically set using WS-Addressing.
+    -->
+    <partnerLink name="orderprocess_client" partnerLinkType="client:OrderProcess" myRole="OrderProcessProvider"/>
+    <partnerLink name="OrderToDB" partnerLinkType="ns1:OrderToDB_plt" partnerRole="OrderToDB_role"/>
+    <partnerLink name="ValidateCreditCard" partnerLinkType="ns2:ValidateCreditCard" partnerRole="execute_ptt"/>
+    <partnerLink name="ErrorHandler" partnerLinkType="ns5:ErrorProcess" partnerRole="ErrorProcessProvider"/>
+  </partnerLinks>
+
+  <!-- 
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      VARIABLES                                                        
+      List of messages and XML documents used within this BPEL process 
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  -->
+  <variables>
+    <!-- Reference to the message passed as input during initiation -->
+    <variable name="inputVariable" messageType="client:OrderProcessRequestMessage"/>
+    <variable name="OrderNumber" type="xsd:string"/>
+    <variable name="Order" element="ns4:Order"/>
+    <variable name="StoreOrderInDB_InputVariable" messageType="ns1:OrdersCollection_msg"/>
+    <variable name="ValidateCC_InputVariable" messageType="ns2:requestMessage"/>
+    <variable name="ValidateCC_OutputVariable" messageType="ns2:replyMessage"/>
+    <variable name="TotalAmount" type="xsd:double"/>
+    <variable name="TotalItem" type="xsd:int"/>
+    <variable name="InvokeErrorHandler_process_InputVariable" messageType="ns5:ErrorProcessRequestMessage"/>
+  </variables>
+  <faultHandlers>
+    <catchAll>
+      <sequence name="Sequence2">
+        <assign name="AssignError">
+          <copy>
+            <from>ora:getPreference('ProjectName')</from>
+            <to>$InvokeErrorHandler_process_InputVariable.payload/ns5:ProcessName</to>
+          </copy>
+          <copy>
+            <from>ora:getFaultAsString()</from>
+            <to>$InvokeErrorHandler_process_InputVariable.payload/ns5:ErrorMessage</to>
+          </copy>
+          <copy>
+            <from>$Order/ns4:OrderNumber</from>
+            <to>$InvokeErrorHandler_process_InputVariable.payload/ns5:OrderNum</to>
+          </copy>
+          <copy>
+            <from>"E"</from>
+            <to>$InvokeErrorHandler_process_InputVariable.payload/ns5:ErrorCode</to>
+          </copy>
+        </assign>
+        <invoke name="InvokeErrorHandler" partnerLink="ErrorHandler"
+                portType="ns5:ErrorProcess" operation="process"
+                inputVariable="InvokeErrorHandler_process_InputVariable" bpelx:invokeAsDetail="no"/>
+        <exit name="Exit1"/>
+      </sequence>
+    </catchAll>
+  </faultHandlers>
+  <!-- 
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+     ORCHESTRATION LOGIC                                               
+     Set of activities coordinating the flow of messages across the    
+     services integrated within this business process                  
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  -->
+  <sequence name="main">
+
+    <!-- Receive input from requestor. (Note: This maps to operation defined in OrderProcess.wsdl) -->
+    <receive name="receiveInput" partnerLink="orderprocess_client" portType="client:OrderProcess" operation="process" variable="inputVariable" createInstance="yes"/>
+    <assign name="Initialization">
+      <copy>
+        <from>count($inputVariable.payload/ns4:Items/ns4:Item)</from>
+        <to>$TotalItem</to>
+      </copy>
+      <copy>
+        <from>0</from>
+        <to>$TotalAmount</to>
+      </copy>
+    </assign>
+    <forEach parallel="no" counterName="n" name="ForEachItem">
+      <startCounterValue>1</startCounterValue>
+      <finalCounterValue>$TotalItem</finalCounterValue>
+      <scope name="Scope1">
+        <assign name="AssignTotal">
+          <copy>
+            <from>(($inputVariable.payload/ns4:Items/ns4:Item[position()=$n]/ns4:Quantity * $inputVariable.payload/ns4:Items/ns4:Item[position()=$n]/ns4:UnitPrice)  + $TotalAmount)</from>
+            <to>$TotalAmount</to>
+          </copy>
+        </assign>
+      </scope>
+    </forEach>
+    <assign name="EnrichOrder">
+      <bpelx:annotation>
+        <bpelx:pattern patternName="bpelx:transformation"></bpelx:pattern>
+      </bpelx:annotation>
+      <copy>
+        <from>ora:doXSLTransformForDoc("../Transformations/EnrichOrder.xsl", $inputVariable.payload)</from>
+        <to variable="Order"/>
+      </copy>
+    </assign>
+    <assign name="AssignTotalAmount">
+      <copy>
+        <from>$TotalAmount</from>
+        <to>$Order/ns4:Billing/ns4:AuthorizationAmount</to>
+      </copy>
+    </assign>
+    <scope name="StoreOrderInDB">
+      <sequence name="StoreOrderInDB">
+        <assign name="TransformOrderToDB">
+          <bpelx:annotation>
+            <bpelx:pattern patternName="bpelx:transformation"></bpelx:pattern>
+          </bpelx:annotation>
+          <copy>
+            <from>ora:doXSLTransformForDoc("../Transformations/XformOrderToDB.xsl", $Order)</from>
+            <to variable="StoreOrderInDB_InputVariable" part="OrdersCollection"/>
+          </copy>
+        </assign>
+        <invoke name="StoreOrderInDB" partnerLink="OrderToDB" portType="ns1:OrderToDB_ptt" operation="insert"
+                inputVariable="StoreOrderInDB_InputVariable" bpelx:invokeAsDetail="no"/>
+      </sequence>
+    </scope>
+    <scope name="ValidatePayment">
+      <sequence name="ValidatePayment">
+        <assign name="AssignPaymentInfo">
+          <copy>
+            <from>$Order/ns4:Billing/ns4:CardNum</from>
+            <to>$ValidateCC_InputVariable.part1/ns4:CardNum</to>
+          </copy>
+          <copy>
+            <from>$Order/ns4:Billing/ns4:ExpireDate</from>
+            <to>$ValidateCC_InputVariable.part1/ns4:ExpireDate</to>
+          </copy>
+          <copy>
+            <from>$Order/ns4:Billing/ns4:AuthorizationAmount</from>
+            <to>$ValidateCC_InputVariable.part1/ns4:AuthorizationAmount</to>
+          </copy>
+        </assign>
+        <invoke name="ValidateCC" partnerLink="ValidateCreditCard" portType="ns2:execute_ptt" operation="execute"
+                inputVariable="ValidateCC_InputVariable" outputVariable="ValidateCC_OutputVariable"
+                bpelx:invokeAsDetail="no"/>
+        <assign name="AssignPaymentStatus">
+          <copy>
+            <from>$ValidateCC_OutputVariable.part1/ns4:Status</from>
+            <to>$Order/ns4:Status</to>
+          </copy>
+        </assign>
+        <extensionActivity>
+          <bpelx:call name="CallUpdateStatus"
+                      xmlns:sp1="http://xmlns.oracle.com/OrderToShipment/OrderProcessing/UpdateStatus"
+                      target="sp1:UpdateStatus">
+            <bpelx:param name="OrderN" copyByValue="yes">$Order/ns4:OrderNumber</bpelx:param>
+            <bpelx:param name="status" copyByValue="yes">$Order/ns4:Status</bpelx:param>
+          </bpelx:call>
+        </extensionActivity>
+      </sequence>
+    </scope>
+    <if name="CheckStatus">
+      <documentation/>
+      <condition>$ValidateCC_OutputVariable.part1/ns4:Status = "Authorized"</condition>
+      <sequence name="Sequence1">
+        <extensionActivity>
+          <bpelx:call target="sp1:UpdateStatus" name="UpdateStatus">
+            <bpelx:param name="OrderN" copyByValue="yes">$Order/ns4:OrderNumber</bpelx:param>
+            <bpelx:param name="status" copyByValue="yes">"ReadyForShip"</bpelx:param>
+          </bpelx:call>
+        </extensionActivity>
+      </sequence>
+    </if>
+  </sequence>
+</process>

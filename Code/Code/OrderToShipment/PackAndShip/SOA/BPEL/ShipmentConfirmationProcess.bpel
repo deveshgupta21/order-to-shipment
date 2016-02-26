@@ -1,0 +1,141 @@
+<?xml version = "1.0" encoding = "UTF-8" ?>
+<!--
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  Oracle JDeveloper BPEL Designer 
+  
+  Created: Sun Feb 21 15:37:23 IST 2016
+  Author:  devegupta
+  Type: BPEL 2.0 Process
+  Purpose: Empty BPEL Process
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+-->
+<process name="ShipmentConfirmationProcess"
+               targetNamespace="http://xmlns.oracle.com/OrderToShipment/PackAndShip/ShipmentConfirmationProcess"
+               xmlns="http://docs.oasis-open.org/wsbpel/2.0/process/executable"
+               xmlns:client="http://xmlns.oracle.com/OrderToShipment/PackAndShip/ShipmentConfirmationProcess"
+               xmlns:ora="http://schemas.oracle.com/xpath/extension"
+               xmlns:bpel="http://docs.oasis-open.org/wsbpel/2.0/process/executable"
+         xmlns:ns1="http://xmlns.oracle.com/pcbpel/adapter/ums/OrderToShipment/PackAndShip/NotifyCustomer"
+         xmlns:ns2="http://xmlns.oracle.com/pcbpel/adapter/file/OrderToShipment/PackAndShip/ReadShipmentConfirmation"
+         xmlns:bpelx="http://schemas.oracle.com/bpel/extension"
+         xmlns:ns3="http://xmlns.oracle.com/pcbpel/adapter/db/OrderToShipment/PackAndShip/StatusUpdate"
+         xmlns:xp20="http://www.oracle.com/XSL/Transform/java/oracle.tip.pc.services.functions.Xpath20"
+         xmlns:bpws="http://schemas.xmlsoap.org/ws/2003/03/business-process/"
+         xmlns:oraext="http://www.oracle.com/XSL/Transform/java/oracle.tip.pc.services.functions.ExtFunc"
+         xmlns:dvm="http://www.oracle.com/XSL/Transform/java/oracle.tip.dvm.LookupValue"
+         xmlns:hwf="http://xmlns.oracle.com/bpel/workflow/xpath"
+         xmlns:ids="http://xmlns.oracle.com/bpel/services/IdentityService/xpath"
+         xmlns:bpm="http://xmlns.oracle.com/bpmn20/extensions" xmlns:ess="http://xmlns.oracle.com/scheduler"
+         xmlns:xdk="http://schemas.oracle.com/bpel/extension/xpath/function/xdk"
+         xmlns:xref="http://www.oracle.com/XSL/Transform/java/oracle.tip.xref.xpath.XRefXPathFunctions"
+         xmlns:ns4="http://TargetNamespace.com/ReadShipmentConfirmation"
+         xmlns:ldap="http://schemas.oracle.com/xpath/extension/ldap"
+         xmlns:ns5="http://platform.integration.oracle/blocks/adapter/fw/metadata/NotifyCustomer"
+         xmlns:ui="http://xmlns.oracle.com/soa/designer" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+         xmlns:ns6="http://xmlns.oracle.com/pcbpel/adapter/db/top/StatusUpdate"
+         xmlns:ns7="http://xmlns.oracle.com/OrderToShipment/ErrorFramework/ErrorProcess">
+
+  <!-- 
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+     ORCHESTRATION LOGIC                                               
+     Set of activities coordinating the flow of messages across the    
+     services integrated within this business process                  
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  -->
+  <import namespace="http://xmlns.oracle.com/pcbpel/adapter/ums/OrderToShipment/PackAndShip/NotifyCustomer"
+          location="../WSDLs/NotifyCustomer.wsdl" importType="http://schemas.xmlsoap.org/wsdl/" ui:processWSDL="true"/>
+  <partnerLinks>
+    <partnerLink name="NotifyCustomer" partnerLinkType="ns1:SendNotification_plt" partnerRole="SendNotification_role"/>
+    <partnerLink name="ReadShipmentConfirmation" partnerLinkType="ns2:Read_plt" myRole="Read_role"/>
+    <partnerLink name="StatusUpdate" partnerLinkType="ns3:StatusUpdate_plt" partnerRole="StatusUpdate_role"/>
+    <partnerLink name="ErrorHandler" partnerLinkType="ns7:ErrorProcess" partnerRole="ErrorProcessProvider"/>
+  </partnerLinks>
+  <variables>
+    <variable name="ReceiveShipmentConfirmation_InputVariable" messageType="ns2:Read_msg"/>
+    <variable name="SendNotification_InputVariable" messageType="ns1:SendNotification_msg"/>
+    <variable name="InvokeUpdateStatus_InputVariable" messageType="ns3:OrdersCollection_msg"/>
+    <variable name="EmailID" type="xsd:string"/>
+    <variable name="i" type="xsd:int"/>
+    <variable name="totalCount" type="xsd:int"/>
+    <variable name="InvokeErrorHandler_process_InputVariable" messageType="ns7:ErrorProcessRequestMessage"/>
+  </variables>
+  <faultHandlers>
+    <catchAll>
+      <sequence name="Sequence2">
+        <assign name="AssignError">
+          <copy>
+            <from>$ReceiveShipmentConfirmation_InputVariable.body/ns4:Order[1]/ns4:OrderNumber</from>
+            <to>$InvokeErrorHandler_process_InputVariable.payload/ns7:OrderNum</to>
+          </copy>
+          <copy>
+            <from>ora:getPreference('ProjectName')</from>
+            <to>$InvokeErrorHandler_process_InputVariable.payload/ns7:ProcessName</to>
+          </copy>
+          <copy>
+            <from>ora:getFaultAsString()</from>
+            <to>$InvokeErrorHandler_process_InputVariable.payload/ns7:ErrorMessage</to>
+          </copy>
+          <copy>
+            <from>"E"</from>
+            <to>$InvokeErrorHandler_process_InputVariable.payload/ns7:ErrorCode</to>
+          </copy>
+        </assign>
+        <invoke name="InvokeErrorHandler" partnerLink="ErrorHandler"
+                portType="ns7:ErrorProcess" operation="process"
+                inputVariable="InvokeErrorHandler_process_InputVariable" bpelx:invokeAsDetail="no"/>
+        <exit name="Exit1"/>
+      </sequence>
+    </catchAll>
+  </faultHandlers>
+  <sequence name="main">
+    <receive name="ReceiveShipmentConfirmation" partnerLink="ReadShipmentConfirmation" portType="ns2:Read_ptt"
+             operation="Read" variable="ReceiveShipmentConfirmation_InputVariable" createInstance="yes"/>
+    <assign name="TransformOrderStatus">
+      <bpelx:annotation>
+        <bpelx:pattern patternName="bpelx:transformation"></bpelx:pattern>
+      </bpelx:annotation>
+      <copy>
+        <from>ora:doXSLTransformForDoc("../Transformations/UpdateOrderStatus.xsl", $ReceiveShipmentConfirmation_InputVariable.body)</from>
+        <to variable="InvokeUpdateStatus_InputVariable" part="OrdersCollection"/>
+      </copy>
+    </assign>
+    <invoke name="InvokeUpdateStatus" partnerLink="StatusUpdate"
+            portType="ns3:StatusUpdate_ptt" operation="update" inputVariable="InvokeUpdateStatus_InputVariable"
+            bpelx:invokeAsDetail="no"/>
+    <assign name="OrderCount">
+      <copy>
+        <from>1</from>
+        <to>$i</to>
+      </copy>
+      <copy>
+        <from>count($ReceiveShipmentConfirmation_InputVariable.body/ns4:Order)</from>
+        <to>$totalCount</to>
+      </copy>
+    </assign>
+    <forEach parallel="no" counterName="n" name="ForEachOrder">
+      <startCounterValue>$i</startCounterValue>
+      <finalCounterValue>$totalCount</finalCounterValue>
+      <scope name="Scope1">
+        <sequence name="Sequence1">
+          <assign name="AssignUserDetails">
+            <copy>
+              <from>concat("Hello ",$ReceiveShipmentConfirmation_InputVariable.body/ns4:Order[position()=$n]/ns4:FNanme, " your order #",$ReceiveShipmentConfirmation_InputVariable.body/ns4:Order[position()=$n]/ns4:OrderNumber," has been shipped" )</from>
+              <to>$SendNotification_InputVariable.body/ns5:payload</to>
+            </copy>
+            <copy>
+              <from>$ReceiveShipmentConfirmation_InputVariable.body/ns4:Order[position()=$n]/ns4:EmailId</from>
+              <to>$EmailID</to>
+            </copy>
+          </assign>
+         
+          <invoke name="NotifyCustomer" partnerLink="NotifyCustomer" portType="ns1:SendNotification_ptt"
+                  operation="SendNotification" inputVariable="SendNotification_InputVariable" bpelx:invokeAsDetail="no">
+            <bpelx:toProperties>
+              <bpelx:toProperty name="jca.ums.to">$EmailID</bpelx:toProperty>
+            </bpelx:toProperties>
+          </invoke>
+        </sequence>
+      </scope>
+    </forEach>
+  </sequence>
+</process>

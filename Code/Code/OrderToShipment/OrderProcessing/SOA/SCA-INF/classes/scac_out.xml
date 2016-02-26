@@ -1,0 +1,23 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Faults>
+   <Fault>
+      <severity>warning</severity>
+      <loc/>
+      <line>22</line>
+      <col/>
+      <file>BPEL/UpdateStatus.sbpel</file>
+      <name>BPEL/UpdateStatus.sbpel</name>
+      <fix>You should place all explicit &lt;bpel:import> statements in a BPEL 2.0 process.</fix>
+      <msg>There are no explicit "import" statements in &lt;bpelx:subProcess> "UpdateStatus" as required by BPEL 2.0 standard.</msg>
+   </Fault>
+   <Fault>
+      <severity>warning</severity>
+      <loc>/ns:composite/ns:wire/ns:target.uri[.='OrderToDB']</loc>
+      <line>101</line>
+      <col>17</col>
+      <file>C:\Demo\OrderToShipment\OrderProcessing\SOA\composite.xml</file>
+      <name>C:\Demo\OrderToShipment\OrderProcessing\SOA\composite.xml</name>
+      <fix/>
+      <msg>Schema validation failed with exception "Invalid element 'element' in 'all'"</msg>
+   </Fault>
+</Faults>

@@ -1,0 +1,21 @@
+<adapter-config name="PollOrderForFulfillment" adapter="db" wsdlLocation="../WSDLs/PollOrderForFulfillment.wsdl" xmlns="http://platform.integration.oracle/blocks/adapter/fw/metadata">
+  
+  <connection-factory UIConnectionName="LocalXE" location="eis/DB/LocalXE"/>
+  <endpoint-activation portType="PollOrderForFulfillment_ptt" operation="receive">
+    <activation-spec className="oracle.tip.adapter.db.DBActivationSpec">
+      <property name="DescriptorName" value="PollOrderForFulfillment.Orders"/>
+      <property name="QueryName" value="PollOrderForFulfillmentSelect"/>
+      <property name="MappingsMetaDataURL" value="PollOrderForFulfillment-or-mappings.xml"/>
+      <property name="PollingStrategy" value="LogicalDeletePollingStrategy"/>
+      <property name="MarkReadColumn" value="STATUS"/>
+      <property name="MarkReadValue" value="FulfillmentInProcess"/>
+      <property name="MarkUnreadValue" value="ReadyForShip"/>
+      <property name="PollingInterval" value="5"/>
+      <property name="MaxRaiseSize" value="1"/>
+      <property name="MaxTransactionSize" value="1"/>
+      <property name="NumberOfThreads" value="1"/>
+      <property name="ReturnSingleResultSet" value="false"/>
+    </activation-spec>
+  </endpoint-activation>
+
+</adapter-config>

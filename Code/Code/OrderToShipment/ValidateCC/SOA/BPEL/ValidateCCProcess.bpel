@@ -1,0 +1,109 @@
+<?xml version = "1.0" encoding = "UTF-8" ?>
+<!--
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  Oracle JDeveloper BPEL Designer 
+  
+  Created: Thu Feb 18 21:47:20 IST 2016
+  Author:  devegupta
+  Type: BPEL 2.0 Process
+  Purpose: Empty BPEL Process
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+-->
+<process name="ValidateCCProcess"
+               targetNamespace="http://xmlns.oracle.com/OrderToShipment/ValidateCC/ValidateCCProcess"
+               xmlns="http://docs.oasis-open.org/wsbpel/2.0/process/executable"
+               xmlns:client="http://xmlns.oracle.com/OrderToShipment/ValidateCC/ValidateCCProcess"
+               xmlns:ora="http://schemas.oracle.com/xpath/extension"
+               xmlns:bpel="http://docs.oasis-open.org/wsbpel/2.0/process/executable"
+         xmlns:ns1="http://xmlns.oracle.com/OrderToShipment/ValidateCC/ValidateCC"
+         xmlns:bpelx="http://schemas.oracle.com/bpel/extension" xmlns:ui="http://xmlns.oracle.com/soa/designer"
+         xmlns:ns2="http://xmlns.oracle.com/pcbpel/adapter/db/OrderToShipment/ValidateCC/getCardDetails"
+         xmlns:ns4="http://xmlns.oracle.com/pcbpel/adapter/db/top/getCardDetails"
+         xmlns:ns3="http://www.oracle.com/soasample"
+         xmlns:ns5="http://xmlns.oracle.com/OrderToShipment/ErrorFramework/ErrorProcess"
+         xmlns:xp20="http://www.oracle.com/XSL/Transform/java/oracle.tip.pc.services.functions.Xpath20"
+         xmlns:bpws="http://schemas.xmlsoap.org/ws/2003/03/business-process/"
+         xmlns:oraext="http://www.oracle.com/XSL/Transform/java/oracle.tip.pc.services.functions.ExtFunc"
+         xmlns:dvm="http://www.oracle.com/XSL/Transform/java/oracle.tip.dvm.LookupValue"
+         xmlns:hwf="http://xmlns.oracle.com/bpel/workflow/xpath"
+         xmlns:ids="http://xmlns.oracle.com/bpel/services/IdentityService/xpath"
+         xmlns:bpm="http://xmlns.oracle.com/bpmn20/extensions" xmlns:ess="http://xmlns.oracle.com/scheduler"
+         xmlns:xdk="http://schemas.oracle.com/bpel/extension/xpath/function/xdk"
+         xmlns:xref="http://www.oracle.com/XSL/Transform/java/oracle.tip.xref.xpath.XRefXPathFunctions"
+         xmlns:ldap="http://schemas.oracle.com/xpath/extension/ldap">
+
+  <!-- 
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+     ORCHESTRATION LOGIC                                               
+     Set of activities coordinating the flow of messages across the    
+     services integrated within this business process                  
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  -->
+  <import namespace="http://xmlns.oracle.com/OrderToShipment/ValidateCC/ValidateCC" location="../WSDLs/ValidateCC.wsdl"
+          importType="http://schemas.xmlsoap.org/wsdl/" ui:processWSDL="true"/>
+  <partnerLinks>
+    <partnerLink name="ValidateCC" partnerLinkType="ns1:ValidateCC" myRole="ValidateCCProvider"/>
+    <partnerLink name="getCardDetails" partnerLinkType="ns2:getCardDetails_plt" partnerRole="getCardDetails_role"/>
+    <partnerLink name="ErrorHandler" partnerLinkType="ns5:ErrorProcess" partnerRole="ErrorProcessProvider"/>
+  </partnerLinks>
+  <variables>
+    <variable name="ReceiveCCDetails_InputVariable" messageType="ns1:ValidateCC_inputMessage"/>
+    <variable name="GetCardDetails_InputVariable" messageType="ns2:getCardDetailsSelect_inputParameters"/>
+    <variable name="GetCardDetails_OutputVariable" messageType="ns2:CreditcarddetailsCollection_msg"/>
+    <variable name="ReplyStatus_OutputVariable" messageType="ns1:ValidateCC_outputMessage"/>
+    <variable name="InvokeErrorHandler_process_InputVariable" messageType="ns5:ErrorProcessRequestMessage"/>
+  </variables>
+  <faultHandlers>
+    <catchAll>
+      <sequence name="Sequence1">
+        <assign name="AssignError">
+          <copy>
+            <from>$ReceiveCCDetails_InputVariable.request/ns3:CardNum</from>
+            <to>$InvokeErrorHandler_process_InputVariable.payload/ns5:OrderNum</to>
+          </copy>
+          <copy>
+            <from>ora:getPreference('ProjectName')</from>
+            <to>$InvokeErrorHandler_process_InputVariable.payload/ns5:ProcessName</to>
+          </copy>
+          <copy>
+            <from>ora:getFaultAsString()</from>
+            <to>$InvokeErrorHandler_process_InputVariable.payload/ns5:ErrorMessage</to>
+          </copy>
+          <copy>
+            <from>"E"</from>
+            <to>$InvokeErrorHandler_process_InputVariable.payload/ns5:ErrorCode</to>
+          </copy>
+        </assign>
+        <invoke name="InvokeErrorHandler" partnerLink="ErrorHandler"
+                portType="ns5:ErrorProcess" operation="process"
+                inputVariable="InvokeErrorHandler_process_InputVariable" bpelx:invokeAsDetail="no"/>
+        <exit name="Exit1"/>
+      </sequence>
+    </catchAll>
+  </faultHandlers>
+  <sequence name="main">
+    <receive name="ReceiveCCDetails" createInstance="yes" partnerLink="ValidateCC" portType="ns1:ValidateCC_ptt"
+             operation="ValidateCC" variable="ReceiveCCDetails_InputVariable"/>
+    <assign name="AssignCN">
+      <copy>
+        <from>$ReceiveCCDetails_InputVariable.request/ns3:CardNum</from>
+        <to>$GetCardDetails_InputVariable.getCardDetailsSelect_inputParameters/ns4:cn</to>
+      </copy>
+    </assign>
+    <invoke name="GetCardDetails" partnerLink="getCardDetails"
+            portType="ns2:getCardDetails_ptt" operation="getCardDetailsSelect"
+            inputVariable="GetCardDetails_InputVariable" outputVariable="GetCardDetails_OutputVariable"
+            bpelx:invokeAsDetail="no"/>
+    <assign name="XformStatus">
+      <bpelx:annotation>
+        <bpelx:pattern patternName="bpelx:transformation"></bpelx:pattern>
+      </bpelx:annotation>
+      <copy>
+        <from>ora:doXSLTransformForDoc("../Transformations/XformStatus.xsl", $ReceiveCCDetails_InputVariable.request, "GetCardDetails_OutputVariable.CreditcarddetailsCollection", $GetCardDetails_OutputVariable.CreditcarddetailsCollection)</from>
+        <to variable="ReplyStatus_OutputVariable" part="reply"/>
+      </copy>
+    </assign>
+    <reply name="ReplyStatus" variable="ReplyStatus_OutputVariable" partnerLink="ValidateCC"
+           portType="ns1:ValidateCC_ptt" operation="ValidateCC"/>
+  </sequence>
+</process>
